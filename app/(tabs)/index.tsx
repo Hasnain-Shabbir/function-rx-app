@@ -32,7 +32,6 @@ export default function Index() {
           />
         </View>
 
-        {/* Stats */}
         <View className="mt-6">
           <FlatList
             data={stats}

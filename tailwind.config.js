@@ -85,6 +85,18 @@ module.exports = {
         medium: "#626e6b",
         light: "#989e9d",
       },
+      borderRadius: {
+        xs: "4px",
+        sm: "8px",
+        md: "12px",
+        lg: "16px",
+        xl: "20px",
+        xxl: "24px",
+      },
+      spacing: {
+        sidebar: "244px",
+        "collapse-sidebar": "75px",
+      },
       boxShadow: {
         xs: "0px 4px 4px 0px rgba(0, 0, 0, 0.04)",
         sm: "0px 13.642px 33px -3.411px rgba(0, 0, 0, 0.1), 0px 1.705px 3.411px 0px rgba(0, 0, 0, 0.04)",

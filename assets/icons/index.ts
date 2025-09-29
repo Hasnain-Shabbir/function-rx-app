@@ -8,6 +8,10 @@ export { default as RepeatIcon } from "./svg/RepeatIcon";
 export { default as UserIcon } from "./svg/UserIcon";
 export { default as WorkoutStretching } from "./svg/WorkoutStretching";
 
+// icons
+export { default as SpinnerDark } from "./spinner-dark.svg";
+export { default as Spinner } from "./spinner.svg";
+
 // Re-export types and constants
 export { ICON_COLORS, ICON_SIZE } from "./types";
 export type { IconName, IconProps } from "./types";
