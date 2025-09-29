@@ -9,6 +9,8 @@ export { default as UserIcon } from "./svg/UserIcon";
 export { default as WorkoutStretching } from "./svg/WorkoutStretching";
 
 // icons
+export { default as PasswordHidden } from "./password-hidden.svg";
+export { default as PasswordShow } from "./password-show.svg";
 export { default as SpinnerDark } from "./spinner-dark.svg";
 export { default as Spinner } from "./spinner.svg";
 
