@@ -81,7 +81,7 @@ module.exports = {
           900: "#27322f",
         },
         "mono-border": "#e4e4e4",
-        "text-misc": "#f9faf7",
+        misc: "#f9faf7",
         medium: "#626e6b",
         light: "#989e9d",
       },
