@@ -1,6 +1,6 @@
 import { Avatar, StatCard, Typography } from "@/components";
 import { stats } from "@/constants/stats";
-import { ScrollView, View } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 
 export default function Index() {
   return (
@@ -34,22 +34,19 @@ export default function Index() {
 
         {/* Stats */}
         <View className="mt-6">
-          <View className="flex-row gap-2 mb-2">
-            {stats.slice(0, 2).map((stat) => (
-              <View key={stat.id} className="flex-1">
-                <StatCard {...stat} />
+          <FlatList
+            data={stats}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={{ gap: 8 }}
+            contentContainerStyle={{ gap: 8 }}
+            renderItem={({ item }) => (
+              <View className="flex-1">
+                <StatCard {...item} />
               </View>
-            ))}
-          </View>
-          {stats.length > 2 && (
-            <View className="flex-row gap-2">
-              {stats.slice(2, 4).map((stat) => (
-                <View key={stat.id} className="flex-1">
-                  <StatCard {...stat} />
-                </View>
-              ))}
-            </View>
-          )}
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
         </View>
       </ScrollView>
     </View>
