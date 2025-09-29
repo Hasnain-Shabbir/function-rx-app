@@ -1,20 +1,34 @@
-import HomeIcon from "@/assets/icons/svg/HomeIcon";
+import {
+  AnalyticsIcon,
+  HomeIcon,
+  ICON_COLORS,
+  MotionIcon,
+  UserIcon,
+} from "@/assets/icons";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 
-const TabItem = ({ focused }: { focused: boolean }) => {
-  const iconColor = focused ? "#5171b1" : "#838786";
+const TabItem = ({
+  focused,
+  icon: Icon,
+  label,
+}: {
+  focused: boolean;
+  icon: React.ComponentType<any>;
+  label: string;
+}) => {
+  const iconColor = focused ? ICON_COLORS.primary : ICON_COLORS.gray;
 
   return (
     <View
       className={`items-center min-h-[60px] min-w-[90px] justify-center px-4 py-2 rounded-xl ${focused ? "bg-primary-50" : ""}`}
     >
-      <HomeIcon color={iconColor} />
+      <Icon color={iconColor} />
       <Text
         className={`text-xs mt-1 ${focused ? "text-primary-500" : "text-gray-600"}`}
       >
-        Home
+        {label}
       </Text>
     </View>
   );
@@ -53,7 +67,20 @@ const _layout = () => {
         options={{
           headerShown: false,
           title: "Home",
-          tabBarIcon: ({ focused }) => <TabItem focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabItem focused={focused} icon={HomeIcon} label="Home" />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          headerShown: false,
+          title: "Analytics",
+          tabBarIcon: ({ focused }) => (
+            <TabItem focused={focused} icon={AnalyticsIcon} label="Analytics" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -61,15 +88,9 @@ const _layout = () => {
         options={{
           headerShown: false,
           title: "Sequences",
-          tabBarIcon: ({ focused }) => <TabItem focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="analytics"
-        options={{
-          headerShown: false,
-          title: "Analytics",
-          tabBarIcon: ({ focused }) => <TabItem focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabItem focused={focused} icon={MotionIcon} label="Sequences" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -77,7 +98,9 @@ const _layout = () => {
         options={{
           headerShown: false,
           title: "Profile",
-          tabBarIcon: ({ focused }) => <TabItem focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabItem focused={focused} icon={UserIcon} label="Profile" />
+          ),
         }}
       />
     </Tabs>

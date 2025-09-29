@@ -1,13 +1,10 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
+import { IconProps } from "../types";
 
-interface HomeIconProps {
-  color?: string;
-}
-
-const HomeIcon = ({ color = "#838786" }: HomeIconProps) => {
+const HomeIcon = ({ color = "#838786", size = 25 }: IconProps) => {
   return (
-    <Svg width={25} height={24} viewBox="0 0 25 24" fill="none">
+    <Svg width={size} height={size - 1} viewBox="0 0 25 24" fill="none">
       <Path
         d="M15.75 17C14.9505 17.6224 13.9002 18 12.75 18C11.5998 18 10.5495 17.6224 9.75 17"
         stroke={color}
