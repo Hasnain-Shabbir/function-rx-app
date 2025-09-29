@@ -18,6 +18,13 @@ const _layout = () => {
           title: "Forgot Password",
         }}
       />
+      <Stack.Screen
+        name="otp-verification"
+        options={{
+          headerShown: false,
+          title: "Otp Verification",
+        }}
+      />
     </Stack>
   );
 };
