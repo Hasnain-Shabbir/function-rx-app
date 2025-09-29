@@ -23,6 +23,7 @@ export type FontWeight =
 
 export interface TypographyProps extends TextProps {
   children: React.ReactNode;
+  className?: string;
   fontWeight?: FontWeight;
   variant: Variant;
 }
