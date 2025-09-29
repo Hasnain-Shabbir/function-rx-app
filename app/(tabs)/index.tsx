@@ -11,14 +11,25 @@ export default function Index() {
           minHeight: "100%",
         }}
       >
-        <Typography variant="h6" fontWeight="semibold">
-          John Doe
-        </Typography>
+        <View className="flex-row justify-between items-center w-full mt-20 gap-4">
+          <View>
+            <Typography
+              variant="body1"
+              fontWeight="semibold"
+              className="text-medium mb-1"
+            >
+              Welcome
+            </Typography>
+            <Typography variant="h6" fontWeight="semibold">
+              John Doe
+            </Typography>
+          </View>
 
-        <Avatar
-          size="xl"
-          src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg"
-        />
+          <Avatar
+            size="xl"
+            src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg"
+          />
+        </View>
       </ScrollView>
     </View>
   );
