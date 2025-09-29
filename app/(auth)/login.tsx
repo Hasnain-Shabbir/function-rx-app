@@ -1,6 +1,7 @@
 import { Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
+import { Link } from "expo-router";
 import React, { useState } from "react";
 import { Image, SafeAreaView, View } from "react-native";
 
@@ -49,9 +50,11 @@ const Login = () => {
               inputSize="md"
             />
             <View className="items-start">
-              <Button variant={"link"} size={"md"} className="p-0">
-                Forgot Password?
-              </Button>
+              <Link href="/forgot-password" asChild>
+                <Button variant={"link"} size={"md"} className="p-0">
+                  Forgot Password?
+                </Button>
+              </Link>
             </View>
           </View>
 

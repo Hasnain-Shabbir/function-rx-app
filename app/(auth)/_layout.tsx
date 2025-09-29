@@ -11,6 +11,13 @@ const _layout = () => {
           title: "Login",
         }}
       />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          headerShown: false,
+          title: "Forgot Password",
+        }}
+      />
     </Stack>
   );
 };
