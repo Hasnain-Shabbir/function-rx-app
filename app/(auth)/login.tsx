@@ -57,11 +57,11 @@ const Login = () => {
                 </Button>
               </Link>
 
-              <Link href="/otp-verification" asChild>
+              {/* <Link href="/otp-verification" asChild>
                 <Button variant={"link"} size={"md"} className="p-0">
                   Otp Verification
                 </Button>
-              </Link>
+              </Link> */}
             </View>
           </View>
 
