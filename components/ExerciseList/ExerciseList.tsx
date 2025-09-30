@@ -25,7 +25,11 @@ const ExerciseList = ({
               superset={exercise}
               index={index}
               version={version}
-              onPress={() => onExercisePress?.(exercise, index)}
+              onPress={
+                onExercisePress
+                  ? () => onExercisePress(exercise, index)
+                  : undefined
+              }
             />
           );
         } else {
@@ -35,7 +39,11 @@ const ExerciseList = ({
               exercise={exercise}
               index={index}
               version={version}
-              onPress={() => onExercisePress?.(exercise, index)}
+              onPress={
+                onExercisePress
+                  ? () => onExercisePress(exercise, index)
+                  : undefined
+              }
             />
           );
         }

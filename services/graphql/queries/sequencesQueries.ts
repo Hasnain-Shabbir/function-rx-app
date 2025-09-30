@@ -120,3 +120,42 @@ export const SEQUENCE_DETAIL = gql`
     }
   }
 `;
+
+export const FETCH_SEQUENTIAL_EXERCISE = gql`
+  query FetchSequentialExercise($fetchSequentialExerciseId: ID!) {
+    fetchSequentialExercise(id: $fetchSequentialExerciseId) {
+      createdAt
+      exercise {
+        archived
+        category
+        chainDirectionality
+        chainReleaseIndication
+        dysfunctionIndications
+        id
+        name
+        painIndications
+        photos {
+          id
+          url
+        }
+        position
+        repetition
+        sets
+        strengthLevel
+        time
+        videoUrl
+        writtenInstructions
+      }
+      id
+      name
+      positionOrder
+      repetition
+      sets
+      shortVersion
+      supersetPosition
+      time
+      updatedAt
+      writtenInstructions
+    }
+  }
+`;

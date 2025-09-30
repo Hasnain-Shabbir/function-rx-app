@@ -1,4 +1,5 @@
 import { CombinedExerciseItem } from "@/services/graphql/queries/sequenceTypes";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -15,6 +16,21 @@ const ExerciseCard = ({
   version,
   onPress,
 }: ExerciseCardProps) => {
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      // Navigate to exercise detail page
+      router.push({
+        pathname: "/exercise-detail",
+        params: {
+          exerciseId: exercise.id,
+        },
+      });
+    }
+  };
   const getInstructions = () => {
     if (exercise.type === "superset") {
       return exercise.sequentialExercises[0]?.shortVersion || "";
@@ -45,7 +61,7 @@ const ExerciseCard = ({
   return (
     <TouchableOpacity
       className="bg-white p-4 rounded-lg border border-gray-200 mb-3"
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <View className="flex-row items-start">
@@ -99,3 +115,4 @@ const ExerciseCard = ({
 };
 
 export { ExerciseCard };
+

@@ -198,13 +198,13 @@ const SequenceDetail = () => {
           <ChevronLeft width={12} height={20} color="#838786" />
         </Button>
 
-        <Button
+        {/* <Button
           variant="outline"
           className="min-w-9 min-h-9 rounded-sm p-1"
           onPress={() => console.log("Download pressed")}
         >
           <Text className="text-gray-600">↓</Text>
-        </Button>
+        </Button> */}
       </View>
 
       <ScrollView
@@ -216,12 +216,14 @@ const SequenceDetail = () => {
       >
         {/* Status Tag */}
         <View className="p-4">
-          <Tag
-            title={sequenceDetail.status}
-            type={getStatusType(sequenceDetail.status) as any}
-            dot={true}
-            size="sm"
-          />
+          <View className="self-start">
+            <Tag
+              title={sequenceDetail.status}
+              type={getStatusType(sequenceDetail.status) as any}
+              dot={true}
+              size="sm"
+            />
+          </View>
         </View>
 
         {/* Assessment Info */}
@@ -270,18 +272,7 @@ const SequenceDetail = () => {
               <Text className="text-gray-500">No exercises found</Text>
             </View>
           ) : (
-            <ExerciseList
-              exercises={exerciseItems}
-              version={version}
-              onExercisePress={(exercise, index) => {
-                console.log(
-                  "Exercise pressed:",
-                  exercise.name,
-                  "at index:",
-                  index
-                );
-              }}
-            />
+            <ExerciseList exercises={exerciseItems} version={version} />
           )}
         </View>
       </ScrollView>

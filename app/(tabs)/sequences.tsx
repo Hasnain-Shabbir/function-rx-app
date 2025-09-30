@@ -1,5 +1,5 @@
 import { ChevronLeft } from "@/assets/icons";
-import { Avatar } from "@/components";
+import { Avatar, Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { Pagination } from "@/components/Pagination/Pagination";
@@ -60,15 +60,16 @@ const Sequences = () => {
           paddingBottom: 100,
         }}
       >
-        <View>
+        <View className="flex-row items-center gap-4 mb-8">
           <Link href="/" asChild>
             <Button
               variant="outline"
-              className="min-w-9 min-h-9 rounded-sm p-1 self-start mb-9"
+              className="min-w-9 min-h-9 rounded-sm p-1 self-start"
             >
               <ChevronLeft width={12} height={20} color="#838786" />
             </Button>
           </Link>
+          <Typography variant="h6">Sequences</Typography>
         </View>
 
         {/* <View className="mb-6">
@@ -81,14 +82,19 @@ const Sequences = () => {
           </Typography>
         </View> */}
 
-        <View className="mb-4">
-          <Input
-            placeholder="Search sequences by title"
-            inputSize="sm"
-            className="w-full"
-            value={keyword}
-            onChangeText={setKeyword}
-          />
+        <View className="mb-4 flex-row gap-3 items-center">
+          <View className="flex-1">
+            <Input
+              placeholder="Search sequences by title"
+              inputSize="sm"
+              className="w-full"
+              value={keyword}
+              onChangeText={setKeyword}
+            />
+          </View>
+          {/* <Button variant="outline" className="min-w-9 min-h-9 rounded-sm p-1">
+            <ChevronLeft width={10} height={16} color="#838786" />
+          </Button> */}
         </View>
 
         {/* Loading State */}
