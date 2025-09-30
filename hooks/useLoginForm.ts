@@ -44,12 +44,12 @@ const useLoginForm = () => {
         },
         onError: (err) => {
           console.error("error while logging in: ", err);
-          // ToastAlert(err.message, false);
+          Toast.error(err.message || "Login failed. Please try again.");
         },
       });
     } catch (error) {
       if (error instanceof Error) {
-        // ToastAlert(error.message, false);
+        Toast.error(error.message || "Login failed. Please try again.");
         console.error("error while logging in: ", error);
       }
     }

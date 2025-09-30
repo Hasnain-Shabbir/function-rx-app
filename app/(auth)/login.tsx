@@ -1,14 +1,30 @@
 import { Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
 import { Link } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, SafeAreaView, View } from "react-native";
 
 const Login = () => {
   const { formData, handleInputChange, handleLoginSubmit, loginUserLoading } =
     useLoginForm();
+  const { authenticateWithBiometric, isBiometricEnabled } = useBiometricAuth();
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, []);
+
+  const checkBiometricAvailability = async () => {
+    const enabled = await isBiometricEnabled();
+    setBiometricAvailable(enabled);
+  };
+
+  const handleBiometricLogin = async () => {
+    await authenticateWithBiometric();
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-misc">
@@ -77,17 +93,16 @@ const Login = () => {
             >
               Login
             </Button>
-            <Button
-              variant="outline"
-              size="md"
-              className="w-full"
-              onPress={() => {
-                // TODO: Implement sign up navigation
-                console.log("Sign up pressed");
-              }}
-            >
-              Login with Biometric
-            </Button>
+            {biometricAvailable && (
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full"
+                onPress={handleBiometricLogin}
+              >
+                Login with Biometric
+              </Button>
+            )}
           </View>
         </View>
       </View>

@@ -35,6 +35,14 @@ const useOtpVerification = () => {
           const userRole = res.validateOtp.user.userType;
 
           if (token) {
+            // Check if user type is client
+            if (userRole !== "client") {
+              Toast.error(
+                "You cannot login to the app. Only clients can login."
+              );
+              return;
+            }
+
             await AsyncStorage.setItem("auth_token", token);
             await AsyncStorage.setItem("user_type", userRole);
             await AsyncStorage.setItem("user_id", user.id);
@@ -49,12 +57,14 @@ const useOtpVerification = () => {
           }
         },
         onError: (err) => {
-          Toast.error(err.message);
+          Toast.error(err.message || "Invalid OTP. Please try again.");
         },
       });
     } catch (error) {
       if (error instanceof Error) {
-        Toast.error(error.message);
+        Toast.error(
+          error.message || "OTP verification failed. Please try again."
+        );
         console.error("error while validating the otp: ", error);
       }
     }
