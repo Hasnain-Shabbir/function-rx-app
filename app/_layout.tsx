@@ -1,5 +1,8 @@
+import { client } from "@/services/apolloClient";
+import { ApolloProvider } from "@apollo/client/react";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
+import ToastManager from "toastify-react-native";
 import "./global.css";
 
 export default function RootLayout() {
@@ -12,12 +15,15 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <Stack>
-      {isAuthenticated ? (
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      ) : (
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      )}
-    </Stack>
+    <ApolloProvider client={client}>
+      <Stack>
+        {isAuthenticated ? (
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        ) : (
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        )}
+      </Stack>
+      <ToastManager />
+    </ApolloProvider>
   );
 }

@@ -1,13 +1,14 @@
 import { Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
+import useLoginForm from "@/hooks/useLoginForm";
 import { Link } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { Image, SafeAreaView, View } from "react-native";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { formData, handleInputChange, handleLoginSubmit, loginUserLoading } =
+    useLoginForm();
 
   return (
     <SafeAreaView className="flex-1 bg-misc">
@@ -36,16 +37,16 @@ const Login = () => {
             <Input
               label="Email"
               placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
+              value={formData.email}
+              onChangeText={(text) => handleInputChange(text, "email")}
               inputSize="md"
               type="email"
             />
             <Input
               label="Password"
               placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
+              value={formData.password}
+              onChangeText={(text) => handleInputChange(text, "password")}
               type="password"
               inputSize="md"
             />
@@ -68,9 +69,9 @@ const Login = () => {
             <Button
               size="md"
               className="w-full mb-4"
-              disabled
+              disabled={loginUserLoading}
               onPress={() => {
-                // TODO: Implement login logic
+                handleLoginSubmit();
                 console.log("Login pressed");
               }}
             >

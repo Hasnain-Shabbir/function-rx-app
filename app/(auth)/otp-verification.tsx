@@ -2,12 +2,16 @@ import { ChevronLeft } from "@/assets/icons";
 import { Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import InputOTP from "@/components/InputOTP/InputOTP";
+
+import useOtpVerification from "@/hooks/useOtpVerification";
 import { Link } from "expo-router";
 import React from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const OtpVerification = () => {
+  const { handleOtpVerification, handleOTPChange } = useOtpVerification();
+
   return (
     <SafeAreaView className="flex-1 items-center px-5 bg-misc">
       <Link href="/forgot-password" asChild>
@@ -29,8 +33,10 @@ const OtpVerification = () => {
         </View>
 
         <View className="gap-4">
-          <InputOTP slots={6} />
-          <Button size={"md"}>Send Code</Button>
+          <InputOTP slots={6} onChange={handleOTPChange} />
+          <Button size={"md"} onPress={handleOtpVerification}>
+            Send Code
+          </Button>
         </View>
       </View>
     </SafeAreaView>
