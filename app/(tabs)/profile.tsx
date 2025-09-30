@@ -44,8 +44,7 @@ const Profile = () => {
   };
 
   const handleChangePassword = () => {
-    // TODO: Implement change password functionality
-    console.log("Change Password pressed");
+    router.push("/change-password");
   };
 
   const handleLogout = async () => {

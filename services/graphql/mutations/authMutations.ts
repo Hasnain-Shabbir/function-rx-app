@@ -51,3 +51,21 @@ export const VALIDATE_OTP = gql`
     }
   }
 `;
+
+export const UPDATE_PASSWORD = gql`
+  mutation UpdatePassword(
+    $password: String!
+    $currentPassword: String!
+    $passwordConfirmation: String!
+  ) {
+    updatePassword(
+      input: {
+        password: $password
+        currentPassword: $currentPassword
+        passwordConfirmation: $passwordConfirmation
+      }
+    ) {
+      response
+    }
+  }
+`;
