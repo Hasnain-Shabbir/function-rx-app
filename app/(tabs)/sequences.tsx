@@ -8,7 +8,7 @@ import Tag from "@/components/Tag/Tag";
 import { API_CONFIG } from "@/constants/config";
 import { useSequenceData } from "@/hooks/useSequenceData";
 import { format } from "date-fns";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -191,7 +191,14 @@ const Sequences = () => {
                       size="sm"
                       className="px-8 py-2"
                       onPress={() =>
-                        console.log("View pressed for sequence", sequence.id)
+                        router.push({
+                          pathname: "/sequence-detail",
+                          params: {
+                            assessmentId: sequence.assessmentId,
+                            assessmentSequenceOrder:
+                              sequence.assessmentSequenceOrder.toString(),
+                          },
+                        })
                       }
                     >
                       View
