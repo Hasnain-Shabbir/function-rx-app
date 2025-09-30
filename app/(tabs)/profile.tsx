@@ -11,8 +11,7 @@ const Profile = () => {
   const router = useRouter();
 
   const handleEditProfile = () => {
-    // TODO: Implement edit profile functionality
-    console.log("Edit Profile pressed");
+    router.push("/edit-profile");
   };
 
   const handleBiometricLogin = () => {
