@@ -5,6 +5,7 @@ import { Input } from "@/components/Input/Input";
 import { Pagination } from "@/components/Pagination/Pagination";
 import { SequenceCardSkeleton } from "@/components/SequenceCardSkeleton/SequenceCardSkeleton";
 import Tag from "@/components/Tag/Tag";
+import { API_CONFIG } from "@/constants/config";
 import { useSequenceData } from "@/hooks/useSequenceData";
 import { format } from "date-fns";
 import { Link } from "expo-router";
@@ -139,7 +140,7 @@ const Sequences = () => {
                         size="sm"
                         src={
                           sequence.practitioner.imageUrl
-                            ? `https://staging-api.functionrx.health${sequence.practitioner.imageUrl}`
+                            ? `${API_CONFIG.BASE_URL}${sequence.practitioner.imageUrl}`
                             : undefined
                         }
                       />
