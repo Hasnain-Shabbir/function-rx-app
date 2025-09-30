@@ -1,19 +1,219 @@
-import { Typography } from "@/components";
+import { ChevronLeft } from "@/assets/icons";
+import { Avatar } from "@/components";
+import { Button } from "@/components/Button/Button";
+import { Input } from "@/components/Input/Input";
+import { Pagination } from "@/components/Pagination/Pagination";
+import { SequenceCardSkeleton } from "@/components/SequenceCardSkeleton/SequenceCardSkeleton";
+import Tag from "@/components/Tag/Tag";
+import { useSequenceData } from "@/hooks/useSequenceData";
+import { format } from "date-fns";
+import { Link } from "expo-router";
 import React from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Sequences = () => {
+  // Use the API hook
+  const {
+    sequences,
+    loading,
+    error,
+    keyword,
+    setKeyword,
+    currentPage,
+    totalPages,
+    handlePageChange,
+  } = useSequenceData(true);
+
+  // Helper function to get status type for Tag component
+  const getStatusType = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "submitted":
+        return "info";
+      case "asked help":
+        return "warning";
+      case "completed":
+        return "success";
+      case "pending":
+        return "warning";
+      default:
+        return "info";
+    }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "dd MMM, yyyy");
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 justify-center bg-misc">
+    <SafeAreaView className="flex-1 bg-misc">
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          minHeight: "100%",
+          paddingBottom: 100,
         }}
       >
-        <Typography variant="h6">Sequences</Typography>
+        <View>
+          <Link href="/" asChild>
+            <Button
+              variant="outline"
+              className="min-w-9 min-h-9 rounded-sm p-1 self-start mb-9"
+            >
+              <ChevronLeft width={12} height={20} color="#838786" />
+            </Button>
+          </Link>
+        </View>
+
+        {/* <View className="mb-6">
+          <Typography variant="caption" className="text-medium">
+            Assessment #1231
+          </Typography>
+          <Typography variant="h6">Posture Fix</Typography>
+          <Typography variant="caption" className="text-medium">
+            22 May, 2025
+          </Typography>
+        </View> */}
+
+        <View className="mb-4">
+          <Input
+            placeholder="Search sequences by title"
+            inputSize="sm"
+            className="w-full"
+            value={keyword}
+            onChangeText={setKeyword}
+          />
+        </View>
+
+        {/* Loading State */}
+        {loading && (
+          <View className="gap-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SequenceCardSkeleton key={index} />
+            ))}
+          </View>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <View className="flex-1 justify-center items-center py-8">
+            <Text className="text-red-500">
+              Error loading sequences: {error.message}
+            </Text>
+          </View>
+        )}
+
+        {/* Sequences List */}
+        {!loading && !error && (
+          <View className="gap-4">
+            {sequences.length === 0 ? (
+              <View className="flex-1 justify-center items-center py-8">
+                <Text className="text-gray-500">No sequences found</Text>
+              </View>
+            ) : (
+              sequences.map((sequence) => (
+                <View
+                  key={sequence.id}
+                  className="bg-white p-4 rounded-lg border border-gray-200"
+                >
+                  {/* Sequence Title */}
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="font-semibold text-gray-900">
+                      Sequence Title:
+                    </Text>
+                    <Text className="text-gray-700">{sequence.title}</Text>
+                  </View>
+
+                  {/* Practitioner */}
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="font-semibold text-gray-900">
+                      Practitioner:
+                    </Text>
+                    <View className="flex-row items-center">
+                      <Avatar
+                        size="sm"
+                        src={
+                          sequence.practitioner.imageUrl
+                            ? `https://staging-api.functionrx.health${sequence.practitioner.imageUrl}`
+                            : undefined
+                        }
+                      />
+                      <Text className="ml-2 text-gray-700">
+                        {sequence.practitioner.fullName}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Date Created */}
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="font-semibold text-gray-900">
+                      Date Created:
+                    </Text>
+                    <Text className="text-gray-700">
+                      {formatDate(sequence.createdAt)}
+                    </Text>
+                  </View>
+
+                  {/* Exercise Count */}
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="font-semibold text-gray-900">
+                      Exercise Count:
+                    </Text>
+                    <Text className="text-gray-700">
+                      {sequence.exerciseCount.toString().padStart(2, "0")}
+                    </Text>
+                  </View>
+
+                  {/* Status */}
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="font-semibold text-gray-900">Status:</Text>
+                    <Tag
+                      title={sequence.status}
+                      type={getStatusType(sequence.status) as any}
+                      dot={true}
+                      size="sm"
+                    />
+                  </View>
+
+                  {/* Actions */}
+                  <View className="flex-row justify-between items-center">
+                    <Text className="font-semibold text-gray-900">
+                      Actions:
+                    </Text>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="px-8 py-2"
+                      onPress={() =>
+                        console.log("View pressed for sequence", sequence.id)
+                      }
+                    >
+                      View
+                    </Button>
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
+        )}
+
+        {/* Pagination */}
+        {!loading && !error && totalPages > 1 && (
+          <View className="mt-5 mb-5 flex-row justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              nextPage={currentPage < totalPages ? currentPage + 1 : null}
+              prevPage={currentPage > 1 ? currentPage - 1 : null}
+              onPageChange={handlePageChange}
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
