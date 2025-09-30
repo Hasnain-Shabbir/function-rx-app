@@ -38,6 +38,7 @@ const _layout = () => {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         tabBarShowLabel: false,
         tabBarItemStyle: {
           width: "100%",

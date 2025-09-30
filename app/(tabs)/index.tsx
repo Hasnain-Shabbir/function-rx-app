@@ -1,10 +1,11 @@
 import { Avatar, StatCard, Typography } from "@/components";
 import { stats } from "@/constants/stats";
 import { FlatList, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
-    <View className="flex-1 justify-center items-center bg-misc">
+    <SafeAreaView className="flex-1 justify-center items-center bg-misc">
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
@@ -12,7 +13,7 @@ export default function Index() {
           minHeight: "100%",
         }}
       >
-        <View className="flex-row justify-between items-center w-full mt-20 gap-4">
+        <View className="flex-row justify-between items-center w-full gap-4">
           <View>
             <Typography
               variant="body1"
@@ -48,6 +49,6 @@ export default function Index() {
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
