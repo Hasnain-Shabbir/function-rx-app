@@ -1,6 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { ToastAlert } from '@/components';
-
+import { useSession } from "@/context/SessionProvider/SessionProvider";
+import { useStorageState } from "@/hooks/useStorageState";
 import { LOGIN_USER } from "@/services/graphql/mutations/authMutations";
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "expo-router";
@@ -8,12 +7,14 @@ import { useState } from "react";
 import { Toast } from "toastify-react-native";
 
 const useLoginForm = () => {
+  const { login } = useSession();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const navigate = useRouter();
+  const [, setLoginEmail] = useStorageState("login_email");
 
   const [loginUser, { loading: loginUserLoading }] = useMutation(LOGIN_USER);
 
@@ -21,6 +22,7 @@ const useLoginForm = () => {
   const handleLoginSubmit = async () => {
     try {
       const { email, password } = formData;
+
       await loginUser({
         variables: {
           email,
@@ -28,11 +30,11 @@ const useLoginForm = () => {
         },
         onCompleted: async (res: any) => {
           console.log("response form the login: ", res.loginUser.message);
-          // show toast
+
           Toast.success(res.loginUser.message);
 
           // set email in local storage to pass in otp verification
-          await AsyncStorage.setItem("login_email", email);
+          setLoginEmail(email);
 
           // reset the form state
           setFormData({

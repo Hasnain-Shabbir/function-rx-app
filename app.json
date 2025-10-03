@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "function-rx-app",
-    "slug": "function-rx-app",
+    "name": "FunctionRx",
+    "slug": "functionrx",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo-small.png",
-    "scheme": "functionrxapp",
+    "scheme": "functionrx",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.functionrxapp"
+      "package": "com.anonymous.functionrx"
     },
     "web": {
       "output": "static",
@@ -40,7 +40,8 @@
           }
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

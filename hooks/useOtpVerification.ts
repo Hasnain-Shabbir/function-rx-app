@@ -1,22 +1,35 @@
+import { useSession } from "@/context/SessionProvider/SessionProvider";
+import { useStorageState } from "@/hooks/useStorageState";
 import { VALIDATE_OTP } from "@/services/graphql/mutations/authMutations";
 import { useMutation } from "@apollo/client/react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
 
-export function getUserType(userType: string): string {
-  return userType.split("::").pop() ?? "";
+export async function getValueFor(key: string) {
+  let result = await SecureStore.getItemAsync(key);
+  if (result) {
+    return result;
+  } else {
+    return null;
+  }
+}
+
+export async function removeValue(key: string) {
+  await SecureStore.deleteItemAsync(key);
 }
 
 const useOtpVerification = () => {
   const [otp, setOtp] = useState("");
-  // const dispatch = useDispatch();
-  // const location = useLocation();
+  const { login } = useSession();
+  const [, setUserType] = useStorageState("user_type");
+  const [, setUserId] = useStorageState("user_id");
+
   const [email, setEmail] = useState("");
-  const [redirectUrl, setRedirectUrl] = useState("");
+  const [, setRedirectUrl] = useState("");
   const navigate = useRouter();
-  const isEmailChangeRoute = location.pathname.includes("email-otp");
+  const isEmailChangeRoute = window.location.pathname.includes("email-otp");
 
   const [validateOtp, { loading: validateOtpLoading }] =
     useMutation(VALIDATE_OTP);
@@ -43,10 +56,9 @@ const useOtpVerification = () => {
               return;
             }
 
-            await AsyncStorage.setItem("auth_token", token);
-            await AsyncStorage.setItem("user_type", userRole);
-            await AsyncStorage.setItem("user_id", user.id);
-            // await AsyncStorage.setItem("clinic_id", user.clinicId);
+            login(token);
+            setUserType(userRole);
+            setUserId(user.id);
 
             Toast.success("You are logged in successfully");
 
@@ -76,8 +88,8 @@ const useOtpVerification = () => {
 
   useEffect(() => {
     const loadSavedData = async () => {
-      const savedEmail = await AsyncStorage.getItem("login_email");
-      const savedRedirectUrl = await AsyncStorage.getItem("redirectTo");
+      const savedEmail = await getValueFor("login_email");
+      const savedRedirectUrl = await getValueFor("redirectTo");
 
       if (savedEmail) {
         setEmail(savedEmail);
@@ -93,9 +105,9 @@ const useOtpVerification = () => {
   // Cleanup localStorage on unmount
   useEffect(() => {
     return () => {
-      AsyncStorage.removeItem("redirectTo");
-      AsyncStorage.removeItem("otp_timer_simple");
-      AsyncStorage.removeItem("otp_timer_simple_timestamp");
+      removeValue("redirectTo");
+      removeValue("otp_timer_simple");
+      removeValue("otp_timer_simple_timestamp");
     };
   }, []);
 

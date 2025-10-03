@@ -5,7 +5,8 @@ import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, SafeAreaView, View } from "react-native";
+import { Image, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Login = () => {
   const { formData, handleInputChange, handleLoginSubmit, loginUserLoading } =

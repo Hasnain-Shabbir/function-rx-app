@@ -1,7 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import { Toast } from "toastify-react-native";
+import { getValueFor, removeValue } from "./useOtpVerification";
+import { setStorageItemAsync } from "./useStorageState";
 
 export const useBiometricAuth = () => {
   const router = useRouter();
@@ -43,14 +44,13 @@ export const useBiometricAuth = () => {
 
       if (result.success) {
         // Check if biometric login is enabled
-        const biometricEnabled =
-          await AsyncStorage.getItem("biometric_enabled");
+        const biometricEnabled = await getValueFor("biometric_enabled");
 
         if (biometricEnabled === "true") {
           // Check if we have stored credentials from a previous login
-          const storedToken = await AsyncStorage.getItem("auth_token");
-          const storedUserType = await AsyncStorage.getItem("user_type");
-          const storedUserId = await AsyncStorage.getItem("user_id");
+          const storedToken = await getValueFor("session");
+          const storedUserType = await getValueFor("user_type");
+          const storedUserId = await getValueFor("user_id");
 
           if (storedToken && storedUserType && storedUserId) {
             // Restore the session
@@ -94,7 +94,7 @@ export const useBiometricAuth = () => {
       }
 
       // Check if user is already logged in
-      const storedToken = await AsyncStorage.getItem("auth_token");
+      const storedToken = await getValueFor("session");
       if (!storedToken) {
         Toast.error(
           "Please login with email and password first to enable biometric login"
@@ -110,7 +110,7 @@ export const useBiometricAuth = () => {
       });
 
       if (result.success) {
-        await AsyncStorage.setItem("biometric_enabled", "true");
+        await setStorageItemAsync("biometric_enabled", "true");
         Toast.success("Biometric login enabled successfully");
         return true;
       } else {
@@ -130,7 +130,7 @@ export const useBiometricAuth = () => {
 
   const isBiometricEnabled = async () => {
     try {
-      const enabled = await AsyncStorage.getItem("biometric_enabled");
+      const enabled = await getValueFor("biometric_enabled");
       return enabled === "true";
     } catch (error) {
       console.error("Error checking biometric status:", error);
@@ -155,7 +155,7 @@ export const useBiometricAuth = () => {
       });
 
       if (result.success) {
-        await AsyncStorage.removeItem("biometric_enabled");
+        await removeValue("biometric_enabled");
         Toast.success("Biometric login disabled successfully");
         return true;
       } else {

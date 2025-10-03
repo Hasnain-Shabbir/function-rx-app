@@ -1,7 +1,7 @@
 import { Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
@@ -50,28 +50,26 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       // Check if biometric login is enabled
-      const biometricEnabled = await AsyncStorage.getItem("biometric_enabled");
+      const biometricEnabled = await getValueFor("biometric_enabled");
 
       if (biometricEnabled === "true") {
         // Keep auth credentials for biometric login
-        await AsyncStorage.multiRemove([
-          "login_email",
-          "redirectTo",
-          "otp_timer_simple",
-          "otp_timer_simple_timestamp",
-        ]);
+        await removeValue("login_email");
+        await removeValue("redirectTo");
+        await removeValue("otp_timer_simple");
+        await removeValue("otp_timer_simple_timestamp");
+
         Toast.success("Logged out successfully");
       } else {
-        // Clear all authentication-related data from AsyncStorage
-        await AsyncStorage.multiRemove([
-          "auth_token",
-          "user_type",
-          "user_id",
-          "login_email",
-          "redirectTo",
-          "otp_timer_simple",
-          "otp_timer_simple_timestamp",
-        ]);
+        // Clear all authentication-related data from
+        await removeValue("session");
+        await removeValue("user_type");
+        await removeValue("user_id");
+        await removeValue("login_email");
+        await removeValue("redirectTo");
+        await removeValue("otp_timer_simple");
+        await removeValue("otp_timer_simple_timestamp");
+
         Toast.success("Logged out successfully");
       }
 
