@@ -1,10 +1,9 @@
-import { Typography } from "@/components";
-import { Button } from "@/components/Button/Button";
+import { ProfileButtons, Typography, UserInfoCard } from "@/components";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
@@ -83,6 +82,11 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 justify-center bg-misc">
+      <View className="bg-white border-b border-borderLight">
+        <Typography variant="body2" className="text-center py-3">
+          Profile
+        </Typography>
+      </View>
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
@@ -90,42 +94,20 @@ const Profile = () => {
           minHeight: "100%",
         }}
       >
-        <Typography variant="h6" className="mb-8">
-          Profile
-        </Typography>
+        <UserInfoCard
+          name="John Doe"
+          email="john.doe@example.com"
+          streak={8}
+          personalBest={110}
+        />
 
-        <Button
-          variant="outline"
-          size="lg"
-          className="mb-4 text-black"
-          onPress={handleEditProfile}
-        >
-          Edit Profile
-        </Button>
-
-        <Button
-          variant="outline"
-          size="lg"
-          className="mb-4"
-          onPress={handleBiometricLogin}
-        >
-          {biometricEnabled
-            ? "Disable Biometric Login"
-            : "Enable Biometric Login"}
-        </Button>
-
-        <Button
-          variant="outline"
-          size="lg"
-          className="mb-4"
-          onPress={handleChangePassword}
-        >
-          Change Password
-        </Button>
-
-        <Button variant="outline" size="lg" onPress={handleLogout}>
-          Logout
-        </Button>
+        <ProfileButtons
+          onEditProfile={handleEditProfile}
+          onBiometricLogin={handleBiometricLogin}
+          onChangePassword={handleChangePassword}
+          onLogout={handleLogout}
+          biometricEnabled={biometricEnabled}
+        />
       </ScrollView>
     </SafeAreaView>
   );

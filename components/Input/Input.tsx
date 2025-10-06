@@ -43,6 +43,8 @@ export interface InputProps extends React.ComponentProps<typeof TextInput> {
   required?: boolean;
   onKeyDown?: (e: any) => void;
   onChange?: (e: any) => void;
+  // Explicitly include placeholder prop
+  placeholder?: string;
 }
 
 const labelSize = {
@@ -107,6 +109,7 @@ const Input = ({
   value,
   onChange,
   onKeyDown,
+  placeholder,
   ...props
 }: InputProps) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -243,6 +246,8 @@ const Input = ({
           }
           editable={!disabled}
           value={value}
+          placeholder={placeholder}
+          placeholderTextColor="#9CA3AF"
           onChangeText={handleInputChange}
           onKeyPress={handleKeyDown}
           style={{
@@ -323,3 +328,4 @@ const Input = ({
 Input.displayName = "Input";
 
 export { Input, inputVariants, labelSize };
+

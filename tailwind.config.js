@@ -104,6 +104,9 @@ module.exports = {
         lg: "0px 34.106px 68.212px -13.642px rgba(0, 0, 0, 0.16), 0px 1.705px 3.411px 0px rgba(0, 0, 0, 0.04)",
         xl: "0px 47.749px 95.497px -17.053px rgba(0, 0, 0, 0.18), 0px 1.705px 3.411px 0px rgba(0, 0, 0, 0.04)",
       },
+      fontFamily: {
+        figtree: ["Figtree", "sans-serif"],
+      },
     },
   },
   plugins: [],

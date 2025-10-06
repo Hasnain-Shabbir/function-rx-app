@@ -8,5 +8,7 @@ export type {
 export { default as Avatar } from "./Avatar/Avatar";
 export type { AvatarProps } from "./Avatar/Avatar.types";
 export type { AvatarSize } from "./Avatar/avatarData";
+export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";
 export { default as StatCard } from "./StatCard/StatCard";
 export type { StatCardProps } from "./StatCard/StatCard.types";
+export { default as UserInfoCard } from "./UserInfoCard/UserInfoCard";
