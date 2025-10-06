@@ -1,4 +1,4 @@
-import { Typography } from "@/components";
+import { Picker, Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { useRouter } from "expo-router";
@@ -45,6 +45,13 @@ const EditProfile = () => {
     }
   };
 
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+
+  const languageOptions = [
+    { label: "Java", value: "java" },
+    { label: "JavaScript", value: "js" },
+  ];
+
   return (
     <SafeAreaView className="flex-1 bg-misc">
       <ScrollView
@@ -57,6 +64,15 @@ const EditProfile = () => {
         <Typography variant="h6" className="mb-6">
           Edit Profile
         </Typography>
+
+        <Picker
+          label="Programming Language"
+          placeholder="Select a language"
+          selectedValue={selectedLanguage}
+          onValueChange={(itemValue) => setSelectedLanguage(String(itemValue))}
+          items={languageOptions}
+          inputSize="md"
+        />
 
         <View className="gap-4">
           {/* First Name */}

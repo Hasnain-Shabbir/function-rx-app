@@ -8,6 +8,8 @@ export type {
 export { default as Avatar } from "./Avatar/Avatar";
 export type { AvatarProps } from "./Avatar/Avatar.types";
 export type { AvatarSize } from "./Avatar/avatarData";
+export { Picker } from "./Picker/Picker";
+export type { PickerItem, PickerProps } from "./Picker/Picker";
 export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";
 export { default as StatCard } from "./StatCard/StatCard";
 export type { StatCardProps } from "./StatCard/StatCard.types";
