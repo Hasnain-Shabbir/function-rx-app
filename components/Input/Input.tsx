@@ -302,7 +302,7 @@ const Input = ({
       {/* Error messages (original, password, or URL errors) */}
       {hasError && displayErrorMessage && (
         <View className="">
-          <View className="flex items-center gap-1">
+          <View className="flex items-start gap-1">
             {/* <img src={InformationRed} /> */}
             <Text className="text-danger-400 text-xs">
               {displayErrorMessage}

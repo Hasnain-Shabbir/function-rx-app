@@ -14,7 +14,7 @@ const OtpVerification = () => {
 
   return (
     <SafeAreaView className="flex-1 items-center px-5 bg-misc">
-      <Link href="/forgot-password" asChild>
+      <Link href="/login" asChild>
         <Button
           variant="outline"
           className="min-w-9 min-h-9 rounded-sm p-1 self-start mb-9"

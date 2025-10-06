@@ -12,16 +12,52 @@ const useLoginForm = () => {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
   const navigate = useRouter();
   const [, setLoginEmail] = useStorageState("login_email");
 
   const [loginUser, { loading: loginUserLoading }] = useMutation(LOGIN_USER);
 
+  // Email validation function
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   // call the backend api
   const handleLoginSubmit = async () => {
     try {
       const { email, password } = formData;
+      let hasErrors = false;
+      const newErrors = { email: "", password: "" };
+
+      // Check if email is empty
+      if (!email.trim()) {
+        newErrors.email = "Email is required";
+        hasErrors = true;
+      } else if (!isValidEmail(email)) {
+        newErrors.email = "Please enter a valid email address";
+        hasErrors = true;
+      }
+
+      // Check if password is empty
+      if (!password.trim()) {
+        newErrors.password = "Password is required";
+        hasErrors = true;
+      }
+
+      // Set errors and return if validation fails
+      if (hasErrors) {
+        setErrors(newErrors);
+        return;
+      }
+
+      // Clear errors if validation passes
+      setErrors({ email: "", password: "" });
 
       await loginUser({
         variables: {
@@ -66,6 +102,14 @@ const useLoginForm = () => {
       ...prevState,
       [inputName]: inputData,
     }));
+
+    // Clear error for the field being typed in
+    if (errors[inputName as keyof typeof errors]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [inputName]: "",
+      }));
+    }
   };
 
   return {
@@ -73,6 +117,7 @@ const useLoginForm = () => {
     handleInputChange,
     handleLoginSubmit,
     loginUserLoading,
+    errors,
   };
 };
 

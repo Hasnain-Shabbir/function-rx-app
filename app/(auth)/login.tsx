@@ -9,8 +9,13 @@ import { Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Login = () => {
-  const { formData, handleInputChange, handleLoginSubmit, loginUserLoading } =
-    useLoginForm();
+  const {
+    formData,
+    handleInputChange,
+    handleLoginSubmit,
+    loginUserLoading,
+    errors,
+  } = useLoginForm();
   const { authenticateWithBiometric, isBiometricEnabled } = useBiometricAuth();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
@@ -58,6 +63,8 @@ const Login = () => {
               onChangeText={(text) => handleInputChange(text, "email")}
               inputSize="md"
               type="email"
+              isError={!!errors.email}
+              errorMessage={errors.email}
             />
             <Input
               label="Password"
@@ -66,6 +73,8 @@ const Login = () => {
               onChangeText={(text) => handleInputChange(text, "password")}
               type="password"
               inputSize="md"
+              isError={!!errors.password}
+              errorMessage={errors.password}
             />
             <View className="items-start">
               <Link href="/forgot-password" asChild>
@@ -86,7 +95,7 @@ const Login = () => {
             <Button
               size="md"
               className="w-full mb-4"
-              disabled={loginUserLoading}
+              // disabled={loginUserLoading}
               onPress={() => {
                 handleLoginSubmit();
                 console.log("Login pressed");
