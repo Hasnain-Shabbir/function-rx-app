@@ -29,8 +29,8 @@ const useOtpVerification = () => {
   const [email, setEmail] = useState("");
   const [, setRedirectUrl] = useState("");
   const navigate = useRouter();
-  const isEmailChangeRoute = window.location.pathname.includes("email-otp");
-
+  // const isEmailChangeRoute = window.location.pathname.includes("email-otp");
+  const isEmailChangeRoute = false;
   const [validateOtp, { loading: validateOtpLoading }] =
     useMutation(VALIDATE_OTP);
 
