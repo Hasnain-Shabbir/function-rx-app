@@ -5,6 +5,7 @@ export type {
   Variant,
 } from "./Typography/Typography.types";
 
+export { AppModal } from "./AppModal/AppModal";
 export { default as Avatar } from "./Avatar/Avatar";
 export type { AvatarProps } from "./Avatar/Avatar.types";
 export type { AvatarSize } from "./Avatar/avatarData";
