@@ -6,6 +6,8 @@ export type {
 } from "./Typography/Typography.types";
 
 export { AppModal } from "./AppModal/AppModal";
+export { default as AppSwitch } from "./AppSwitch/AppSwitch";
+export type { AppSwitchProps } from "./AppSwitch/AppSwitch";
 export { default as Avatar } from "./Avatar/Avatar";
 export type { AvatarProps } from "./Avatar/Avatar.types";
 export type { AvatarSize } from "./Avatar/avatarData";
@@ -14,4 +16,6 @@ export type { PickerItem, PickerProps } from "./Picker/Picker";
 export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";
 export { default as StatCard } from "./StatCard/StatCard";
 export type { StatCardProps } from "./StatCard/StatCard.types";
+export { default as ToggleInput } from "./ToggleInput/ToggleInput";
+export type { ToggleInputProps } from "./ToggleInput/ToggleInput";
 export { default as UserInfoCard } from "./UserInfoCard/UserInfoCard";
