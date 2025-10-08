@@ -5,6 +5,13 @@ export type {
   Variant,
 } from "./Typography/Typography.types";
 
+export { default as AppInput } from "./AppInput/AppInput";
+export type { AppInputProps } from "./AppInput/AppInput";
+export { default as AppInputGroup } from "./AppInputGroup/AppInputGroup";
+export type {
+  AppInputGroupProps,
+  AppInputItem,
+} from "./AppInputGroup/AppInputGroup";
 export { AppModal } from "./AppModal/AppModal";
 export { default as AppSwitch } from "./AppSwitch/AppSwitch";
 export type { AppSwitchProps } from "./AppSwitch/AppSwitch";

@@ -1,9 +1,35 @@
-import { Avatar, StatCard, Typography } from "@/components";
+import {
+  AppInput,
+  AppInputGroup,
+  Avatar,
+  StatCard,
+  Typography,
+} from "@/components";
 import { stats } from "@/constants/stats";
+import { useState } from "react";
 import { FlatList, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
+  const [firstName, setFirstName] = useState("John");
+  const [lastName, setLastName] = useState("Doe");
+  const [email, setEmail] = useState("johndoe@gmail.com");
+  const [gender] = useState("Male");
+  const [dateOfBirth] = useState("23 May, 1990");
+  const [currentPassword, setCurrentPassword] = useState("•••••••••");
+  const [newPassword, setNewPassword] = useState("••••");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleGenderPress = () => {
+    // Simulate opening gender picker
+    console.log("Opening gender picker");
+  };
+
+  const handleDateOfBirthPress = () => {
+    // Simulate opening date picker
+    console.log("Opening date picker");
+  };
+
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-misc">
       <ScrollView
@@ -47,6 +73,126 @@ export default function Index() {
             )}
             keyExtractor={(item) => item.id.toString()}
           />
+        </View>
+
+        {/* AppInput Examples Section */}
+        <View className="mt-8 gap-6">
+          <Typography variant="h6" fontWeight="semibold" className="text-black">
+            Input Components Demo
+          </Typography>
+
+          {/* Single AppInput Examples */}
+          <View className="gap-4">
+            <Typography
+              variant="body1"
+              fontWeight="medium"
+              className="text-gray-700"
+            >
+              Single Inputs
+            </Typography>
+
+            <AppInput
+              title="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Enter first name"
+            />
+
+            <AppInput
+              title="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email address"
+            />
+          </View>
+
+          {/* AppInputGroup Example - Personal Details */}
+          <View className="gap-4">
+            <Typography
+              variant="body1"
+              fontWeight="medium"
+              className="text-gray-700"
+            >
+              Input Group - Personal Details
+            </Typography>
+
+            <AppInputGroup
+              title="Personal Details"
+              inputs={[
+                {
+                  id: "firstName",
+                  title: "First Name",
+                  value: firstName,
+                  onChangeText: setFirstName,
+                },
+                {
+                  id: "lastName",
+                  title: "Last Name",
+                  value: lastName,
+                  onChangeText: setLastName,
+                },
+                {
+                  id: "email",
+                  title: "Email",
+                  value: email,
+                  onChangeText: setEmail,
+                },
+                {
+                  id: "gender",
+                  title: "Gender",
+                  value: gender,
+                  onPress: handleGenderPress,
+                  showArrow: true,
+                  editable: false,
+                },
+                {
+                  id: "dateOfBirth",
+                  title: "Date of Birth",
+                  value: dateOfBirth,
+                  onPress: handleDateOfBirthPress,
+                  showArrow: true,
+                  editable: false,
+                },
+              ]}
+            />
+          </View>
+
+          {/* AppInputGroup Example - Password Change */}
+          <View className="gap-4">
+            <Typography
+              variant="body1"
+              fontWeight="medium"
+              className="text-gray-700"
+            >
+              Input Group - Password Change
+            </Typography>
+
+            <AppInputGroup
+              inputs={[
+                {
+                  id: "currentPassword",
+                  title: "Current Password",
+                  value: currentPassword,
+                  onChangeText: setCurrentPassword,
+                  placeholder: "Enter current password",
+                },
+                {
+                  id: "newPassword",
+                  title: "New Password",
+                  value: newPassword,
+                  onChangeText: setNewPassword,
+                  placeholder: "Enter new password",
+                },
+                {
+                  id: "confirmPassword",
+                  title: "Confirm Password",
+                  value: confirmPassword,
+                  onChangeText: setConfirmPassword,
+                  placeholder: "Type here...",
+                },
+              ]}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
