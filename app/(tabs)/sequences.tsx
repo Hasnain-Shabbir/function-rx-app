@@ -9,11 +9,17 @@ import { API_CONFIG } from "@/constants/config";
 import { useSequenceData } from "@/hooks/useSequenceData";
 import { format } from "date-fns";
 import { Link, router } from "expo-router";
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const Sequences = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
+
   // Use the API hook
   const {
     sequences,
@@ -24,6 +30,7 @@ const Sequences = () => {
     currentPage,
     totalPages,
     handlePageChange,
+    refetch,
   } = useSequenceData(true);
 
   // Helper function to get status type for Tag component
@@ -51,14 +58,28 @@ const Sequences = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Error refreshing sequences:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-misc">
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: 100 + insets.bottom,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View className="flex-row items-center gap-4 mb-8">
           <Link href="/" asChild>

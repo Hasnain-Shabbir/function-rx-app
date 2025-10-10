@@ -7,7 +7,7 @@ import {
 } from "@/components";
 import { stats } from "@/constants/stats";
 import { useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -19,6 +19,7 @@ export default function Index() {
   const [currentPassword, setCurrentPassword] = useState("•••••••••");
   const [newPassword, setNewPassword] = useState("••••");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleGenderPress = () => {
     // Simulate opening gender picker
@@ -30,6 +31,14 @@ export default function Index() {
     console.log("Opening date picker");
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate refresh - you can add actual data fetching here
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-misc">
       <ScrollView
@@ -38,6 +47,9 @@ export default function Index() {
         contentContainerStyle={{
           minHeight: "100%",
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View className="flex-row justify-between items-center w-full gap-4">
           <View>

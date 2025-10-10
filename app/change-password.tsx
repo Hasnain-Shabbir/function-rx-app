@@ -4,12 +4,17 @@ import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import useChangePassword from "@/hooks/useChangePassword";
 import { useRouter } from "expo-router";
-import React from "react";
-import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const ChangePassword = () => {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
   const {
     formData,
     errors,
@@ -17,6 +22,19 @@ const ChangePassword = () => {
     handleInputChange,
     handleChangePassword,
   } = useChangePassword();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate refresh - you can add actual change password refresh logic here
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Error refreshing change password page:", error);
+      setRefreshing(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-misc">
@@ -39,8 +57,11 @@ const ChangePassword = () => {
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: 100 + insets.bottom,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View className="max-w-sm mx-auto w-full">
           <View className="mb-6">

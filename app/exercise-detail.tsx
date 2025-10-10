@@ -8,14 +8,19 @@ import { API_CONFIG } from "@/constants/config";
 import { useSequentialExercise } from "@/hooks/useSequentialExercise";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 // Simple user role check - assuming client role for now
 const isClient = true;
 
 const ExerciseDetail = () => {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
   const { exerciseId } = useLocalSearchParams<{
     exerciseId: string;
   }>();
@@ -37,6 +42,19 @@ const ExerciseDetail = () => {
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate refresh - you can add actual exercise detail refresh logic here
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Error refreshing exercise detail:", error);
+      setRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -87,7 +105,7 @@ const ExerciseDetail = () => {
           className="flex-1 p-4"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: 100,
+            paddingBottom: 100 + insets.bottom,
           }}
         >
           {/* Title Skeleton */}
@@ -217,8 +235,11 @@ const ExerciseDetail = () => {
         className="flex-1 p-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: 100 + insets.bottom,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {/* Title and Icons Bar */}
         <View className="mb-6">

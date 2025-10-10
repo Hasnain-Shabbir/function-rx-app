@@ -7,12 +7,17 @@ import Tag from "@/components/Tag/Tag";
 import { useSequenceDetail } from "@/hooks/useSequenceDetail";
 import { format } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const SequenceDetail = () => {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
   const { assessmentId, assessmentSequenceOrder } = useLocalSearchParams<{
     assessmentId: string;
     assessmentSequenceOrder: string;
@@ -25,6 +30,7 @@ const SequenceDetail = () => {
     error,
     version,
     handleVersionChange,
+    refetch,
   } = useSequenceDetail(
     assessmentId || "",
     parseInt(assessmentSequenceOrder || "0"),
@@ -54,6 +60,19 @@ const SequenceDetail = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      if (refetch) {
+        await refetch();
+      }
+    } catch (error) {
+      console.error("Error refreshing sequence detail:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-misc">
@@ -67,7 +86,7 @@ const SequenceDetail = () => {
           className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: 100,
+            paddingBottom: 100 + insets.bottom,
           }}
         >
           {/* Status Tag Skeleton */}
@@ -157,7 +176,10 @@ const SequenceDetail = () => {
         </ScrollView>
 
         {/* Bottom Action Bar Skeleton */}
-        <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <View
+          className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        >
           <View className="flex-row items-center justify-between">
             <Skeleton width={60} height={20} borderRadius={4} />
             <Skeleton width={120} height={40} borderRadius={4} />
@@ -211,8 +233,11 @@ const SequenceDetail = () => {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: 100 + insets.bottom,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {/* Status Tag */}
         <View className="p-4">
@@ -278,7 +303,10 @@ const SequenceDetail = () => {
       </ScrollView>
 
       {/* Bottom Action Bar */}
-      <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <View
+        className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+      >
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Text className="text-gray-600 mr-1">👤</Text>

@@ -8,6 +8,7 @@ import {
 import { Tabs } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabItem = ({
   focused,
@@ -34,7 +35,9 @@ const TabItem = ({
   );
 };
 
-const _layout = () => {
+const Layout = () => {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -52,10 +55,10 @@ const _layout = () => {
           borderTopColor: "#e5e5e5",
           position: "absolute",
           overflow: "hidden",
-          height: 80,
+          height: 80 + insets.bottom,
           paddingLeft: 8,
           paddingTop: 8,
-          paddingBottom: 8,
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingRight: 8,
           borderWidth: 1,
           shadowRadius: 0,
@@ -108,4 +111,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default Layout;

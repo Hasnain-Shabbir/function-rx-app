@@ -3,12 +3,13 @@ import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 const EditProfile = () => {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -45,6 +46,19 @@ const EditProfile = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate refresh - you can add actual edit profile refresh logic here
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Error refreshing edit profile page:", error);
+      setRefreshing(false);
+    }
+  };
+
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
   const languageOptions = [
@@ -60,6 +74,9 @@ const EditProfile = () => {
         contentContainerStyle={{
           paddingBottom: 20,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <Typography variant="h6" className="mb-6">
           Edit Profile

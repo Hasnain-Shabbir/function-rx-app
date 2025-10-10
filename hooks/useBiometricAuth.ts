@@ -1,3 +1,4 @@
+import { isTokenExpired } from "@/utils/jwtUtils";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import { Toast } from "toastify-react-native";
@@ -53,9 +54,36 @@ export const useBiometricAuth = () => {
           const storedUserId = await getValueFor("user_id");
 
           if (storedToken && storedUserType && storedUserId) {
-            // Restore the session
-            router.push("/");
-            return true;
+            // Check if token is expired (HIPAA compliance)
+            const tokenExpired = isTokenExpired(storedToken);
+
+            if (tokenExpired === true) {
+              // Token is expired, disable biometric login and clear stored data
+              await removeValue("biometric_enabled");
+              await removeValue("session");
+              await removeValue("user_type");
+              await removeValue("user_id");
+
+              Toast.error(
+                "Your session has expired. Please login with email and password again."
+              );
+              return false;
+            } else if (tokenExpired === null) {
+              // Invalid token, disable biometric login
+              await removeValue("biometric_enabled");
+              await removeValue("session");
+              await removeValue("user_type");
+              await removeValue("user_id");
+
+              Toast.error(
+                "Invalid session. Please login with email and password again."
+              );
+              return false;
+            } else {
+              // Token is valid, restore the session
+              router.push("/");
+              return true;
+            }
           } else {
             // No stored credentials, need to login first
             Toast.info(
@@ -131,7 +159,30 @@ export const useBiometricAuth = () => {
   const isBiometricEnabled = async () => {
     try {
       const enabled = await getValueFor("biometric_enabled");
-      return enabled === "true";
+
+      if (enabled !== "true") {
+        return false;
+      }
+
+      // Check if token is still valid (HIPAA compliance)
+      const storedToken = await getValueFor("session");
+      if (!storedToken) {
+        // No token, disable biometric login
+        await removeValue("biometric_enabled");
+        return false;
+      }
+
+      const tokenExpired = isTokenExpired(storedToken);
+      if (tokenExpired === true || tokenExpired === null) {
+        // Token is expired or invalid, disable biometric login and clear data
+        await removeValue("biometric_enabled");
+        await removeValue("session");
+        await removeValue("user_type");
+        await removeValue("user_id");
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error checking biometric status:", error);
       return false;

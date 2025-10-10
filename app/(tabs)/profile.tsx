@@ -1,9 +1,10 @@
 import { ProfileButtons, Typography, UserInfoCard } from "@/components";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
+import { isTokenExpired } from "@/utils/jwtUtils";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
@@ -12,6 +13,7 @@ const Profile = () => {
   const { enableBiometricLogin, disableBiometricLogin, isBiometricEnabled } =
     useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const checkBiometricStatus = React.useCallback(async () => {
     const enabled = await isBiometricEnabled();
@@ -80,6 +82,38 @@ const Profile = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Check if current session token is expired (HIPAA compliance)
+      const storedToken = await getValueFor("session");
+      if (storedToken) {
+        const tokenExpired = isTokenExpired(storedToken);
+        if (tokenExpired === true || tokenExpired === null) {
+          // Token is expired or invalid, disable biometric login and clear data
+          await removeValue("biometric_enabled");
+          await removeValue("session");
+          await removeValue("user_type");
+          await removeValue("user_id");
+
+          Toast.error("Your session has expired. Please login again.");
+
+          // Navigate to login screen
+          router.replace("/login");
+          return;
+        }
+      }
+
+      // Refresh biometric status
+      await checkBiometricStatus();
+      // You can add other profile data refresh logic here
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 justify-center bg-misc">
       <View className="bg-white border-b border-borderLight">
@@ -93,6 +127,9 @@ const Profile = () => {
         contentContainerStyle={{
           minHeight: "100%",
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <UserInfoCard
           name="John Doe"
