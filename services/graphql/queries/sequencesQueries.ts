@@ -159,3 +159,50 @@ export const FETCH_SEQUENTIAL_EXERCISE = gql`
     }
   }
 `;
+
+export const FETCH_USER = gql`
+  query User($fetchUserId: ID) {
+    fetchUser(id: $fetchUserId) {
+      user {
+        address
+        archived
+        calendarLink
+        city
+        clinicId
+        clinicName
+        clinicTheme
+        createdAt
+        deleted
+        email
+        firstName
+        fullName
+        gender
+        selfServiceClinic
+        id
+        imageUrl
+        invitationSentAt
+        lastName
+        lastSignInAt
+        onboardingCompleted
+        phone
+        revokeAccess
+        state
+        subscriptionPaid
+        userType
+        zipCode
+        clinicImageUrl
+        dateOfBirth
+        conditions
+        medicalHistory
+        pregnant
+        surgeries
+        pregnancyDueDate
+        totalClients
+        sequenceCount
+        maxSequenceLimit
+        therapyCount
+        resetPasswordToken
+      }
+    }
+  }
+`;
