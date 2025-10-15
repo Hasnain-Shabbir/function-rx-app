@@ -1,13 +1,20 @@
-import { Picker, Typography } from "@/components";
-import { Button } from "@/components/Button/Button";
-import { Input } from "@/components/Input/Input";
+import { ChevronLeft } from "@/assets/icons";
+import { AppInputGroup, Typography } from "@/components";
 import { getValueFor } from "@/hooks/useOtpVerification";
 import { UPDATE_USER } from "@/services/graphql/mutations/authMutations";
 import { FETCH_USER } from "@/services/graphql/queries/sequencesQueries";
 import { useMutation, useQuery } from "@apollo/client/react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
@@ -15,7 +22,22 @@ const EditProfile = () => {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    gender: "",
+    dateOfBirth: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+  });
+  const [originalData, setOriginalData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -43,6 +65,7 @@ const EditProfile = () => {
     variables: { fetchUserId: userId },
     skip: !userId,
     errorPolicy: "all",
+    fetchPolicy: "cache-and-network",
   });
 
   // Update mutation
@@ -53,7 +76,11 @@ const EditProfile = () => {
     if (userData) {
       const user = (userData as any)?.fetchUser?.user;
       if (user) {
-        setFormData({
+        const dateOfBirth = user.dateOfBirth
+          ? new Date(user.dateOfBirth)
+          : new Date();
+        setSelectedDate(dateOfBirth);
+        const userFormData = {
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
@@ -64,7 +91,9 @@ const EditProfile = () => {
           city: user.city || "",
           state: user.state || "",
           zipCode: user.zipCode || "",
-        });
+        };
+        setFormData(userFormData);
+        setOriginalData(userFormData);
       }
     }
   }, [userData]);
@@ -129,36 +158,130 @@ const EditProfile = () => {
         return;
       }
 
-      // Prepare variables for the mutation
-      const variables: any = {
+      // Prepare userAttributes object - only include changed fields
+      const userAttributes: any = {};
+
+      // Check each field and only include if it has changed from original
+      if (
+        formData.firstName !== originalData.firstName &&
+        formData.firstName?.trim()
+      ) {
+        userAttributes.firstName = formData.firstName.trim();
+      }
+      if (
+        formData.lastName !== originalData.lastName &&
+        formData.lastName?.trim()
+      ) {
+        userAttributes.lastName = formData.lastName.trim();
+      }
+      // Skip email - requires OTP verification
+      if (formData.phone !== originalData.phone && formData.phone?.trim()) {
+        userAttributes.phone = formData.phone.trim();
+      }
+      if (formData.gender !== originalData.gender && formData.gender?.trim()) {
+        userAttributes.gender = formData.gender.trim();
+      }
+      if (
+        formData.dateOfBirth !== originalData.dateOfBirth &&
+        formData.dateOfBirth?.trim()
+      ) {
+        // Convert date to ISO format for the API
+        try {
+          const dateObj = new Date(formData.dateOfBirth);
+          if (!isNaN(dateObj.getTime())) {
+            userAttributes.dateOfBirth = dateObj.toISOString();
+          }
+        } catch (dateError) {
+          console.error("Date conversion error:", dateError);
+          Toast.error("Invalid date format");
+          return;
+        }
+      }
+      if (
+        formData.address !== originalData.address &&
+        formData.address?.trim()
+      ) {
+        userAttributes.address = formData.address.trim();
+      }
+      if (formData.city !== originalData.city && formData.city?.trim()) {
+        userAttributes.city = formData.city.trim();
+      }
+      if (formData.state !== originalData.state && formData.state?.trim()) {
+        userAttributes.state = formData.state.trim();
+      }
+      if (
+        formData.zipCode !== originalData.zipCode &&
+        formData.zipCode?.trim()
+      ) {
+        userAttributes.zipCode = formData.zipCode.trim();
+      }
+
+      // Check if there are any changes
+      if (Object.keys(userAttributes).length === 0) {
+        Toast.info("No changes detected");
+        return;
+      }
+
+      console.log("Sending userAttributes:", userAttributes);
+
+      // Prepare input object
+      const input = {
         id: userId,
+        userAttributes,
       };
 
-      // Only include fields that have values
-      if (formData.firstName?.trim())
-        variables.firstName = formData.firstName.trim();
-      if (formData.lastName?.trim())
-        variables.lastName = formData.lastName.trim();
-      if (formData.email?.trim()) variables.email = formData.email.trim();
-      if (formData.phone?.trim()) variables.phone = formData.phone.trim();
-      if (formData.gender?.trim()) variables.gender = formData.gender.trim();
-      if (formData.dateOfBirth?.trim())
-        variables.dateOfBirth = formData.dateOfBirth.trim();
-      if (formData.address?.trim()) variables.address = formData.address.trim();
-      if (formData.city?.trim()) variables.city = formData.city.trim();
-      if (formData.state?.trim()) variables.state = formData.state.trim();
-      if (formData.zipCode?.trim()) variables.zipCode = formData.zipCode.trim();
-
       await updateUser({
-        variables,
+        variables: { input },
+        update: (cache, { data }: any) => {
+          try {
+            // Update the cache with the new user data
+            if (data?.updateUser?.user) {
+              cache.writeQuery({
+                query: FETCH_USER,
+                variables: { fetchUserId: userId },
+                data: {
+                  fetchUser: {
+                    user: data.updateUser.user,
+                  },
+                },
+              });
+            }
+          } catch (cacheError) {
+            console.error("Cache update error:", cacheError);
+          }
+        },
         onCompleted: (res: any) => {
-          Toast.success("Profile updated successfully");
-          console.log("Profile updated:", res.updateUser.user);
-          router.back();
+          try {
+            Toast.success("Profile updated successfully");
+            console.log("Profile updated:", res?.updateUser?.user);
+            // Update local state with the new data
+            if (res?.updateUser?.user) {
+              const updatedUser = res.updateUser.user;
+              const updatedFormData = {
+                firstName: updatedUser.firstName || "",
+                lastName: updatedUser.lastName || "",
+                email: updatedUser.email || "",
+                phone: updatedUser.phone || "",
+                gender: updatedUser.gender || "",
+                dateOfBirth: updatedUser.dateOfBirth || "",
+                address: updatedUser.address || "",
+                city: updatedUser.city || "",
+                state: updatedUser.state || "",
+                zipCode: updatedUser.zipCode || "",
+              };
+              setFormData(updatedFormData);
+              setOriginalData(updatedFormData);
+            }
+            router.back();
+          } catch (completionError) {
+            console.error("Error in completion handler:", completionError);
+            Toast.error("Profile updated but there was an issue");
+          }
         },
         onError: (err) => {
           console.error("Error updating profile:", err);
-          Toast.error(err.message || "Failed to update profile");
+          const errorMessage = err?.message || "Failed to update profile";
+          Toast.error(errorMessage);
         },
       });
     } catch (error) {
@@ -180,11 +303,27 @@ const EditProfile = () => {
     }
   };
 
-  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || new Date();
+    setShowDatePicker(Platform.OS === "ios");
+    setSelectedDate(currentDate);
 
-  const languageOptions = [
-    { label: "Java", value: "java" },
-    { label: "JavaScript", value: "js" },
+    // Format date as MM/DD/YYYY
+    const formattedDate = currentDate.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    });
+
+    setFormData((prevState) => ({
+      ...prevState,
+      dateOfBirth: formattedDate,
+    }));
+  };
+
+  const genderOptions = [
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
   ];
 
   // Show loading state while user data is being fetched
@@ -200,6 +339,33 @@ const EditProfile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-misc">
+      {/* Header */}
+      <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center justify-between">
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => router.back()} className="p-2">
+          <ChevronLeft width={24} height={24} color="#6B7280" />
+        </TouchableOpacity>
+
+        {/* Title */}
+        <Typography variant="h6" className="font-semibold text-gray-900">
+          Edit Profile
+        </Typography>
+
+        {/* Save Button */}
+        <TouchableOpacity
+          onPress={handleSaveChanges}
+          disabled={updateUserLoading}
+          className="p-2"
+        >
+          <Typography
+            variant="body1"
+            className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-blue-500"}`}
+          >
+            Save
+          </Typography>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
@@ -210,149 +376,171 @@ const EditProfile = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <Typography variant="h6" className="mb-6">
-          Edit Profile
-        </Typography>
-
-        <Picker
-          label="Programming Language"
-          placeholder="Select a language"
-          selectedValue={selectedLanguage}
-          onValueChange={(itemValue) => setSelectedLanguage(String(itemValue))}
-          items={languageOptions}
-          inputSize="md"
-        />
-
-        <View className="gap-4">
-          {/* First Name */}
-          <Input
-            label="First Name"
-            placeholder="Enter your first name"
-            value={formData.firstName}
-            onChangeText={(text) => handleInputChange(text, "firstName")}
-            inputSize="md"
-            isError={!!errors.firstName}
-            errorMessage={errors.firstName}
+        <View className="gap-6">
+          {/* Personal Details Group */}
+          <AppInputGroup
+            title="Personal Details"
+            inputs={[
+              {
+                id: "firstName",
+                title: "First Name",
+                value: formData.firstName,
+                onChangeText: (text) => handleInputChange(text, "firstName"),
+                placeholder: "Enter your first name",
+              },
+              {
+                id: "lastName",
+                title: "Last Name",
+                value: formData.lastName,
+                onChangeText: (text) => handleInputChange(text, "lastName"),
+                placeholder: "Enter your last name",
+              },
+              {
+                id: "email",
+                title: "Email",
+                value: formData.email,
+                onChangeText: (text) => handleInputChange(text, "email"),
+                placeholder: "Enter your email",
+                editable: false,
+              },
+              {
+                id: "phone",
+                title: "Phone Number",
+                value: formData.phone,
+                onChangeText: (text) => handleInputChange(text, "phone"),
+                placeholder: "Enter your phone number",
+              },
+              {
+                id: "gender",
+                title: "Gender",
+                value: formData.gender,
+                onPress: () => setShowGenderPicker(true),
+                showArrow: true,
+                editable: false,
+              },
+              {
+                id: "dateOfBirth",
+                title: "Date of Birth",
+                value: formData.dateOfBirth,
+                onPress: () => setShowDatePicker(true),
+                showArrow: true,
+                editable: false,
+              },
+            ]}
           />
 
-          {/* Last Name */}
-          <Input
-            label="Last Name"
-            placeholder="Enter your last name"
-            value={formData.lastName}
-            onChangeText={(text) => handleInputChange(text, "lastName")}
-            inputSize="md"
-            isError={!!errors.lastName}
-            errorMessage={errors.lastName}
-          />
-
-          {/* Email */}
-          <Input
-            label="Email"
-            placeholder="Enter your email"
-            value={formData.email}
-            onChangeText={(text) => handleInputChange(text, "email")}
-            inputSize="md"
-            type="email"
-            isError={!!errors.email}
-            errorMessage={errors.email}
-          />
-
-          {/* Phone Number */}
-          <Input
-            label="Phone Number"
-            placeholder="Enter your phone number"
-            value={formData.phone}
-            onChangeText={(text) => handleInputChange(text, "phone")}
-            inputSize="md"
-            keyboardType="phone-pad"
-            isError={!!errors.phone}
-            errorMessage={errors.phone}
-          />
-
-          {/* Gender */}
-          <Input
-            label="Gender"
-            placeholder="Enter your gender"
-            value={formData.gender}
-            onChangeText={(text) => handleInputChange(text, "gender")}
-            inputSize="md"
-            isError={!!errors.gender}
-            errorMessage={errors.gender}
-          />
-
-          {/* Date of Birth */}
-          <Input
-            label="Date of Birth"
-            placeholder="Enter your date of birth (MM/DD/YYYY)"
-            value={formData.dateOfBirth}
-            onChangeText={(text) => handleInputChange(text, "dateOfBirth")}
-            inputSize="md"
-            isError={!!errors.dateOfBirth}
-            errorMessage={errors.dateOfBirth}
-          />
-
-          {/* Address */}
-          <Input
-            label="Address"
-            placeholder="Enter your address"
-            value={formData.address}
-            onChangeText={(text) => handleInputChange(text, "address")}
-            inputSize="md"
-            multiline
-            numberOfLines={3}
-            isError={!!errors.address}
-            errorMessage={errors.address}
-          />
-
-          {/* City */}
-          <Input
-            label="City"
-            placeholder="Enter your city"
-            value={formData.city}
-            onChangeText={(text) => handleInputChange(text, "city")}
-            inputSize="md"
-            isError={!!errors.city}
-            errorMessage={errors.city}
-          />
-
-          {/* State */}
-          <Input
-            label="State"
-            placeholder="Enter your state"
-            value={formData.state}
-            onChangeText={(text) => handleInputChange(text, "state")}
-            inputSize="md"
-            isError={!!errors.state}
-            errorMessage={errors.state}
-          />
-
-          {/* Zipcode */}
-          <Input
-            label="Zipcode"
-            placeholder="Enter your zipcode"
-            value={formData.zipCode}
-            onChangeText={(text) => handleInputChange(text, "zipCode")}
-            inputSize="md"
-            keyboardType="numeric"
-            isError={!!errors.zipCode}
-            errorMessage={errors.zipCode}
+          {/* Address Details Group */}
+          <AppInputGroup
+            title="Address Details"
+            inputs={[
+              {
+                id: "address",
+                title: "Address",
+                value: formData.address,
+                onChangeText: (text) => handleInputChange(text, "address"),
+                placeholder: "Enter your address",
+                multiline: true,
+                numberOfLines: 3,
+              },
+              {
+                id: "city",
+                title: "City",
+                value: formData.city,
+                onChangeText: (text) => handleInputChange(text, "city"),
+                placeholder: "Enter your city",
+              },
+              {
+                id: "state",
+                title: "State",
+                value: formData.state,
+                onChangeText: (text) => handleInputChange(text, "state"),
+                placeholder: "Enter your state",
+              },
+              {
+                id: "zipCode",
+                title: "Zipcode",
+                value: formData.zipCode,
+                onChangeText: (text) => handleInputChange(text, "zipCode"),
+                placeholder: "Enter your zipcode",
+              },
+            ]}
           />
         </View>
 
-        {/* Save Changes Button */}
-        <View className="mt-8">
-          <Button
-            variant="default"
-            size="lg"
-            className="w-full"
-            onPress={handleSaveChanges}
-            loading={updateUserLoading}
-            disabled={updateUserLoading}
+        {/* Date Picker Modal */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={handleDateChange}
+            maximumDate={new Date()}
+          />
+        )}
+
+        {/* Gender Picker Bottom Sheet */}
+        <Modal
+          visible={showGenderPicker}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowGenderPicker(false)}
+        >
+          <TouchableOpacity
+            className="flex-1 justify-end bg-black/50"
+            activeOpacity={1}
+            onPress={() => setShowGenderPicker(false)}
           >
-            Save Changes
-          </Button>
-        </View>
+            <TouchableOpacity
+              className="bg-white rounded-t-3xl shadow-lg"
+              activeOpacity={1}
+              onPress={() => {}}
+            >
+              {/* Drag Handle */}
+              <View className="items-center py-3">
+                <View className="w-10 h-1 bg-gray-300 rounded-full" />
+              </View>
+
+              {/* Title */}
+              <View className="px-6 pb-4">
+                <Typography
+                  variant="h6"
+                  fontWeight="semibold"
+                  className="text-center"
+                >
+                  Gender
+                </Typography>
+              </View>
+
+              {/* Options */}
+              <View className="px-6 pb-8">
+                {genderOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
+                    onPress={() => {
+                      handleInputChange(option.value, "gender");
+                      setShowGenderPicker(false);
+                    }}
+                  >
+                    <Typography variant="body1" className="text-gray-900">
+                      {option.label}
+                    </Typography>
+                    {formData.gender === option.value && (
+                      <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
+                        <Typography
+                          variant="body2"
+                          className="text-white font-bold"
+                        >
+                          ✓
+                        </Typography>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
