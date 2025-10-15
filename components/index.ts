@@ -18,6 +18,7 @@ export type { AppSwitchProps } from "./AppSwitch/AppSwitch";
 export { default as Avatar } from "./Avatar/Avatar";
 export type { AvatarProps } from "./Avatar/Avatar.types";
 export type { AvatarSize } from "./Avatar/avatarData";
+export { ImagePicker } from "./ImagePicker";
 export { Picker } from "./Picker/Picker";
 export type { PickerItem, PickerProps } from "./Picker/Picker";
 export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";

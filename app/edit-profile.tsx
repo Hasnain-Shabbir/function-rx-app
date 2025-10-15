@@ -1,5 +1,5 @@
 import { ChevronLeft } from "@/assets/icons";
-import { AppInputGroup, Typography } from "@/components";
+import { AppInputGroup, ImagePicker, Typography } from "@/components";
 import { getValueFor } from "@/hooks/useOtpVerification";
 import { UPDATE_USER } from "@/services/graphql/mutations/authMutations";
 import { FETCH_USER } from "@/services/graphql/queries/sequencesQueries";
@@ -36,6 +36,7 @@ const EditProfile = () => {
     city: "",
     state: "",
     zipCode: "",
+    profileImage: "",
   });
   const [originalData, setOriginalData] = useState({
     firstName: "",
@@ -48,6 +49,7 @@ const EditProfile = () => {
     city: "",
     state: "",
     zipCode: "",
+    profileImage: "",
   });
   const [errors, setErrors] = useState<Partial<typeof formData>>({});
 
@@ -91,6 +93,7 @@ const EditProfile = () => {
           city: user.city || "",
           state: user.state || "",
           zipCode: user.zipCode || "",
+          profileImage: user.profileImage || "",
         };
         setFormData(userFormData);
         setOriginalData(userFormData);
@@ -215,6 +218,12 @@ const EditProfile = () => {
       ) {
         userAttributes.zipCode = formData.zipCode.trim();
       }
+      if (
+        formData.profileImage !== originalData.profileImage &&
+        formData.profileImage?.trim()
+      ) {
+        userAttributes.profileImage = formData.profileImage.trim();
+      }
 
       // Check if there are any changes
       if (Object.keys(userAttributes).length === 0) {
@@ -268,6 +277,7 @@ const EditProfile = () => {
                 city: updatedUser.city || "",
                 state: updatedUser.state || "",
                 zipCode: updatedUser.zipCode || "",
+                profileImage: updatedUser.profileImage || "",
               };
               setFormData(updatedFormData);
               setOriginalData(updatedFormData);
@@ -376,6 +386,20 @@ const EditProfile = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {/* Profile Image Picker */}
+        <View className="items-center mb-8">
+          <ImagePicker
+            initialImage={formData.profileImage}
+            onImageSelected={(uri) => {
+              setFormData((prev) => ({
+                ...prev,
+                profileImage: uri,
+              }));
+            }}
+            size={120}
+          />
+        </View>
+
         <View className="gap-6">
           {/* Personal Details Group */}
           <AppInputGroup
