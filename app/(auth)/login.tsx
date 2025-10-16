@@ -5,7 +5,16 @@ import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, RefreshControl, ScrollView, View } from "react-native";
+import {
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Login = () => {
@@ -47,101 +56,108 @@ const Login = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-misc">
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-        }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View className="flex-1 justify-center items-center px-6">
-          {/* Logo Section */}
-          <View className="items-center mb-6">
-            <Image
-              source={require("@/assets/images/logo-full.png")}
-              className="w-48 h-16 mb-4"
-              resizeMode="contain"
-            />
-          </View>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="flex-1 bg-misc">
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+            }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <View className="flex-1 justify-center items-center px-6">
+              {/* Logo Section */}
+              <View className="items-center mb-6">
+                <Image
+                  source={require("@/assets/images/logo-full.png")}
+                  className="w-48 h-16 mb-4"
+                  resizeMode="contain"
+                />
+              </View>
 
-          {/* Login Form Section */}
-          <View className="w-full max-w-sm shadow-lg gap-6 border border-borderLight p-4 rounded-2xl bg-white">
-            <View>
-              <Typography variant="h6" fontWeight="semibold">
-                Login
-              </Typography>
-              <Typography variant="body1" className="text-medium mt-1">
-                Enter your credentials
-              </Typography>
-            </View>
+              {/* Login Form Section */}
+              <View className="w-full max-w-sm shadow-lg gap-6 border border-borderLight p-4 rounded-2xl bg-white">
+                <View>
+                  <Typography variant="h6" fontWeight="semibold">
+                    Login
+                  </Typography>
+                  <Typography variant="body1" className="text-medium mt-1">
+                    Enter your credentials
+                  </Typography>
+                </View>
 
-            <View className="gap-4">
-              <Input
-                label="Email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChangeText={(text) => handleInputChange(text, "email")}
-                inputSize="md"
-                type="email"
-                isError={!!errors.email}
-                errorMessage={errors.email}
-              />
-              <Input
-                label="Password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChangeText={(text) => handleInputChange(text, "password")}
-                type="password"
-                inputSize="md"
-                isError={!!errors.password}
-                errorMessage={errors.password}
-              />
-              <View className="items-start">
-                <Link href="/forgot-password" asChild>
-                  <Button variant={"link"} size={"md"} className="p-0">
-                    Forgot Password?
-                  </Button>
-                </Link>
+                <View className="gap-4">
+                  <Input
+                    label="Email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChangeText={(text) => handleInputChange(text, "email")}
+                    inputSize="md"
+                    type="email"
+                    isError={!!errors.email}
+                    errorMessage={errors.email}
+                  />
+                  <Input
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChangeText={(text) => handleInputChange(text, "password")}
+                    type="password"
+                    inputSize="md"
+                    isError={!!errors.password}
+                    errorMessage={errors.password}
+                  />
+                  <View className="items-start">
+                    <Link href="/forgot-password" asChild>
+                      <Button variant={"link"} size={"md"} className="p-0">
+                        Forgot Password?
+                      </Button>
+                    </Link>
 
-                {/* <Link href="/otp-verification" asChild>
+                    {/* <Link href="/otp-verification" asChild>
                 <Button variant={"link"} size={"md"} className="p-0">
                   Otp Verification
                 </Button>
               </Link> */}
+                  </View>
+                </View>
+
+                <View>
+                  <Button
+                    size="md"
+                    className="w-full mb-4"
+                    // disabled={loginUserLoading}
+                    onPress={() => {
+                      handleLoginSubmit();
+                      console.log("Login pressed");
+                    }}
+                  >
+                    Login
+                  </Button>
+                  {biometricAvailable && (
+                    <Button
+                      variant="outline"
+                      size="md"
+                      className="w-full"
+                      onPress={handleBiometricLogin}
+                    >
+                      Login with Biometric
+                    </Button>
+                  )}
+                </View>
               </View>
             </View>
-
-            <View>
-              <Button
-                size="md"
-                className="w-full mb-4"
-                // disabled={loginUserLoading}
-                onPress={() => {
-                  handleLoginSubmit();
-                  console.log("Login pressed");
-                }}
-              >
-                Login
-              </Button>
-              {biometricAvailable && (
-                <Button
-                  variant="outline"
-                  size="md"
-                  className="w-full"
-                  onPress={handleBiometricLogin}
-                >
-                  Login with Biometric
-                </Button>
-              )}
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

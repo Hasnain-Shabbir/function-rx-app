@@ -3,11 +3,15 @@ import { stats } from "@/constants/stats";
 import { useUser } from "@/context";
 import { useState } from "react";
 import { FlatList, RefreshControl, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
   const { user, loading, refetch } = useUser();
+  const insets = useSafeAreaInsets();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -29,6 +33,7 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             minHeight: "100%",
+            paddingBottom: 100 + insets.bottom,
           }}
         >
           <View className="flex-row justify-between items-center w-full gap-4">
@@ -73,6 +78,7 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           minHeight: "100%",
+          paddingBottom: 100 + insets.bottom,
         }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

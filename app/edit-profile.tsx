@@ -15,11 +15,14 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   RefreshControl,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -578,328 +581,361 @@ const EditProfile = () => {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-misc">
-      {/* Show loading state while user data is being fetched */}
-      {userLoading ? (
-        <EditProfileSkeleton />
-      ) : userData && !(userData as any)?.fetchUser?.user ? (
-        /* Show error state if user data failed to load */
-        <View className="flex-1 justify-center items-center px-4">
-          <Typography
-            variant="body1"
-            className="text-center text-danger-600 mb-4"
-          >
-            Failed to load user profile. Please try again.
-          </Typography>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="bg-primary-500 px-6 py-3 rounded-lg"
-          >
-            <Typography variant="body1" className="text-white font-medium">
-              Go Back
-            </Typography>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        /* Show actual content when data is loaded */
-        <>
-          {/* Header */}
-          <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center justify-between">
-            {/* Back Button */}
-            <TouchableOpacity onPress={() => router.back()} className="p-2">
-              <ChevronLeft width={14} height={14} color="#6B7280" />
-            </TouchableOpacity>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1"
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="flex-1 bg-misc">
+          <View className="flex-1">
+            {/* Show loading state while user data is being fetched */}
+            {userLoading ? (
+              <EditProfileSkeleton />
+            ) : userData && !(userData as any)?.fetchUser?.user ? (
+              /* Show error state if user data failed to load */
+              <View className="flex-1 justify-center items-center px-4">
+                <Typography
+                  variant="body1"
+                  className="text-center text-danger-600 mb-4"
+                >
+                  Failed to load user profile. Please try again.
+                </Typography>
+                <TouchableOpacity
+                  onPress={() => router.back()}
+                  className="bg-primary-500 px-6 py-3 rounded-lg"
+                >
+                  <Typography
+                    variant="body1"
+                    className="text-white font-medium"
+                  >
+                    Go Back
+                  </Typography>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              /* Show actual content when data is loaded */
+              <>
+                {/* Header */}
+                <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center justify-between">
+                  {/* Back Button */}
+                  <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="p-2"
+                  >
+                    <ChevronLeft width={14} height={14} color="#6B7280" />
+                  </TouchableOpacity>
 
-            {/* Title */}
-            <Typography variant="body1" className="font-semibold text-gray-900">
-              Edit Profile
-            </Typography>
+                  {/* Title */}
+                  <Typography
+                    variant="body1"
+                    className="font-semibold text-gray-900"
+                  >
+                    Edit Profile
+                  </Typography>
 
-            {/* Save Button */}
-            <TouchableOpacity
-              onPress={handleSaveChanges}
-              disabled={updateUserLoading}
-              className="p-2"
-            >
-              <Typography
-                variant="body3"
-                className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-primary-500"}`}
-              >
-                Save
-              </Typography>
-            </TouchableOpacity>
-          </View>
+                  {/* Save Button */}
+                  <TouchableOpacity
+                    onPress={handleSaveChanges}
+                    disabled={updateUserLoading}
+                    className="p-2"
+                  >
+                    <Typography
+                      variant="body3"
+                      className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-primary-500"}`}
+                    >
+                      Save
+                    </Typography>
+                  </TouchableOpacity>
+                </View>
 
-          <ScrollView
-            className="flex-1 p-5"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingBottom: 20,
-            }}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
-            {/* Profile Image Picker */}
-            <View className="items-center mb-8">
-              <ImagePicker
-                initialImage={formData.profileImage}
-                onImageSelected={(uri, file) => {
-                  console.log("Image selected - URI:", uri);
-                  console.log("Image selected - File:", file);
-                  console.log("File object structure:", {
-                    uri: file?.uri,
-                    type: file?.type,
-                    name: file?.name,
-                  });
-                  setFormData((prev) => ({
-                    ...prev,
-                    profileImage: uri,
-                  }));
-                  // Store the file for upload
-                  setSelectedImageFile(file);
-                  console.log("SelectedImageFile set to:", file);
-                }}
-                size={120}
-              />
-            </View>
+                <ScrollView
+                  className="flex-1 p-5"
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingBottom: 20,
+                  }}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                >
+                  {/* Profile Image Picker */}
+                  <View className="items-center mb-8">
+                    <ImagePicker
+                      initialImage={formData.profileImage}
+                      onImageSelected={(uri, file) => {
+                        console.log("Image selected - URI:", uri);
+                        console.log("Image selected - File:", file);
+                        console.log("File object structure:", {
+                          uri: file?.uri,
+                          type: file?.type,
+                          name: file?.name,
+                        });
+                        setFormData((prev) => ({
+                          ...prev,
+                          profileImage: uri,
+                        }));
+                        // Store the file for upload
+                        setSelectedImageFile(file);
+                        console.log("SelectedImageFile set to:", file);
+                      }}
+                      size={120}
+                    />
+                  </View>
 
-            <View className="gap-6">
-              {/* Personal Details Group */}
-              <AppInputGroup
-                title="Personal Details"
-                inputs={[
-                  {
-                    id: "firstName",
-                    title: "First Name",
-                    value: formData.firstName,
-                    onChangeText: (text) =>
-                      handleInputChange(text, "firstName"),
-                    placeholder: "Enter your first name",
-                  },
-                  {
-                    id: "lastName",
-                    title: "Last Name",
-                    value: formData.lastName,
-                    onChangeText: (text) => handleInputChange(text, "lastName"),
-                    placeholder: "Enter your last name",
-                  },
-                  {
-                    id: "email",
-                    title: "Email",
-                    value: formData.email,
-                    onChangeText: (text) => handleInputChange(text, "email"),
-                    placeholder: "Enter your email",
-                    editable: false,
-                  },
-                  {
-                    id: "phone",
-                    title: "Phone Number",
-                    value: formData.phone,
-                    onChangeText: (text) => handleInputChange(text, "phone"),
-                    placeholder: "Enter your phone number",
-                    errorMessage: hasSubmitted ? phoneError : undefined,
-                  },
-                  {
-                    id: "gender",
-                    title: "Gender",
-                    value: formData.gender,
-                    onPress: () => setShowGenderPicker(true),
-                    showArrow: true,
-                    editable: false,
-                  },
-                  {
-                    id: "dateOfBirth",
-                    title: "Date of Birth",
-                    value: formatDateForDisplay(formData.dateOfBirth),
-                    onPress: () => setShowDatePicker(true),
-                    showArrow: true,
-                    editable: false,
-                  },
-                ]}
-              />
+                  <View className="gap-6">
+                    {/* Personal Details Group */}
+                    <AppInputGroup
+                      title="Personal Details"
+                      inputs={[
+                        {
+                          id: "firstName",
+                          title: "First Name",
+                          value: formData.firstName,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "firstName"),
+                          placeholder: "Enter your first name",
+                        },
+                        {
+                          id: "lastName",
+                          title: "Last Name",
+                          value: formData.lastName,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "lastName"),
+                          placeholder: "Enter your last name",
+                        },
+                        {
+                          id: "email",
+                          title: "Email",
+                          value: formData.email,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "email"),
+                          placeholder: "Enter your email",
+                          editable: false,
+                        },
+                        {
+                          id: "phone",
+                          title: "Phone Number",
+                          value: formData.phone,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "phone"),
+                          placeholder: "Enter your phone number",
+                          errorMessage: hasSubmitted ? phoneError : undefined,
+                        },
+                        {
+                          id: "gender",
+                          title: "Gender",
+                          value: formData.gender,
+                          onPress: () => setShowGenderPicker(true),
+                          showArrow: true,
+                          editable: false,
+                        },
+                        {
+                          id: "dateOfBirth",
+                          title: "Date of Birth",
+                          value: formatDateForDisplay(formData.dateOfBirth),
+                          onPress: () => setShowDatePicker(true),
+                          showArrow: true,
+                          editable: false,
+                        },
+                      ]}
+                    />
 
-              {/* Address Details Group */}
-              <AppInputGroup
-                title="Address Details"
-                inputs={[
-                  {
-                    id: "address",
-                    title: "Address",
-                    value: formData.address,
-                    onChangeText: (text) => handleInputChange(text, "address"),
-                    placeholder: "Enter your address",
-                    multiline: true,
-                    numberOfLines: 3,
-                  },
-                  {
-                    id: "city",
-                    title: "City",
-                    value: formData.city,
-                    onChangeText: (text) => handleInputChange(text, "city"),
-                    placeholder: "Enter your city",
-                  },
-                  {
-                    id: "state",
-                    title: "State",
-                    value: formData.state,
-                    onPress: () => setShowStatePicker(true),
-                    showArrow: true,
-                    editable: false,
-                  },
-                  {
-                    id: "zipCode",
-                    title: "Zipcode",
-                    value: formData.zipCode,
-                    onChangeText: (text) => handleInputChange(text, "zipCode"),
-                    placeholder: "Enter your zipcode",
-                  },
-                ]}
-              />
-            </View>
+                    {/* Address Details Group */}
+                    <AppInputGroup
+                      title="Address Details"
+                      inputs={[
+                        {
+                          id: "address",
+                          title: "Address",
+                          value: formData.address,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "address"),
+                          placeholder: "Enter your address",
+                          multiline: true,
+                          numberOfLines: 3,
+                        },
+                        {
+                          id: "city",
+                          title: "City",
+                          value: formData.city,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "city"),
+                          placeholder: "Enter your city",
+                        },
+                        {
+                          id: "state",
+                          title: "State",
+                          value: formData.state,
+                          onPress: () => setShowStatePicker(true),
+                          showArrow: true,
+                          editable: false,
+                        },
+                        {
+                          id: "zipCode",
+                          title: "Zipcode",
+                          value: formData.zipCode,
+                          onChangeText: (text) =>
+                            handleInputChange(text, "zipCode"),
+                          placeholder: "Enter your zipcode",
+                        },
+                      ]}
+                    />
+                  </View>
 
-            {/* Date Picker Modal */}
-            {showDatePicker && (
-              <DateTimePicker
-                value={selectedDate}
-                mode="date"
-                display={Platform.OS === "ios" ? "spinner" : "default"}
-                onChange={handleDateChange}
-                maximumDate={new Date()}
-              />
+                  {/* Date Picker Modal */}
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={selectedDate}
+                      mode="date"
+                      display={Platform.OS === "ios" ? "spinner" : "default"}
+                      onChange={handleDateChange}
+                      maximumDate={new Date()}
+                    />
+                  )}
+
+                  {/* Gender Picker Bottom Sheet */}
+                  <Modal
+                    visible={showGenderPicker}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setShowGenderPicker(false)}
+                  >
+                    <TouchableOpacity
+                      className="flex-1 justify-end bg-black/50"
+                      activeOpacity={1}
+                      onPress={() => setShowGenderPicker(false)}
+                    >
+                      <TouchableOpacity
+                        className="bg-white rounded-t-3xl shadow-lg"
+                        activeOpacity={1}
+                        onPress={() => {}}
+                      >
+                        {/* Drag Handle */}
+                        <View className="items-center py-3">
+                          <View className="w-10 h-1 bg-gray-300 rounded-full" />
+                        </View>
+
+                        {/* Title */}
+                        <View className="px-6 pb-4">
+                          <Typography
+                            variant="h6"
+                            fontWeight="semibold"
+                            className="text-center"
+                          >
+                            Gender
+                          </Typography>
+                        </View>
+
+                        {/* Options */}
+                        <View className="px-6 pb-8">
+                          {genderOptions.map((option) => (
+                            <TouchableOpacity
+                              key={option.value}
+                              className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
+                              onPress={() => {
+                                handleInputChange(option.value, "gender");
+                                setShowGenderPicker(false);
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                className="text-gray-900"
+                              >
+                                {option.label}
+                              </Typography>
+                              {formData.gender === option.value && (
+                                <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
+                                  <Typography
+                                    variant="body2"
+                                    className="text-white font-bold"
+                                  >
+                                    ✓
+                                  </Typography>
+                                </View>
+                              )}
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  </Modal>
+
+                  {/* State Picker Bottom Sheet */}
+                  <Modal
+                    visible={showStatePicker}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setShowStatePicker(false)}
+                  >
+                    <TouchableOpacity
+                      className="flex-1 justify-end bg-black/50"
+                      activeOpacity={1}
+                      onPress={() => setShowStatePicker(false)}
+                    >
+                      <TouchableOpacity
+                        className="bg-white rounded-t-3xl shadow-lg"
+                        activeOpacity={1}
+                        onPress={() => {}}
+                      >
+                        {/* Drag Handle */}
+                        <View className="items-center py-3">
+                          <View className="w-10 h-1 bg-gray-300 rounded-full" />
+                        </View>
+
+                        {/* Title */}
+                        <View className="px-6 pb-4">
+                          <Typography
+                            variant="h6"
+                            fontWeight="semibold"
+                            className="text-center"
+                          >
+                            Select State
+                          </Typography>
+                        </View>
+
+                        {/* Options */}
+                        <ScrollView className="max-h-80 px-6 pb-8">
+                          {usStates.map((state) => (
+                            <TouchableOpacity
+                              key={state.abbreviation}
+                              className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
+                              onPress={() => {
+                                handleInputChange(state.name, "state");
+                                setShowStatePicker(false);
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                className="text-gray-900"
+                              >
+                                {state.name}
+                              </Typography>
+                              {formData.state === state.name && (
+                                <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
+                                  <Typography
+                                    variant="body2"
+                                    className="text-white font-bold"
+                                  >
+                                    ✓
+                                  </Typography>
+                                </View>
+                              )}
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  </Modal>
+                </ScrollView>
+              </>
             )}
-
-            {/* Gender Picker Bottom Sheet */}
-            <Modal
-              visible={showGenderPicker}
-              transparent={true}
-              animationType="slide"
-              onRequestClose={() => setShowGenderPicker(false)}
-            >
-              <TouchableOpacity
-                className="flex-1 justify-end bg-black/50"
-                activeOpacity={1}
-                onPress={() => setShowGenderPicker(false)}
-              >
-                <TouchableOpacity
-                  className="bg-white rounded-t-3xl shadow-lg"
-                  activeOpacity={1}
-                  onPress={() => {}}
-                >
-                  {/* Drag Handle */}
-                  <View className="items-center py-3">
-                    <View className="w-10 h-1 bg-gray-300 rounded-full" />
-                  </View>
-
-                  {/* Title */}
-                  <View className="px-6 pb-4">
-                    <Typography
-                      variant="h6"
-                      fontWeight="semibold"
-                      className="text-center"
-                    >
-                      Gender
-                    </Typography>
-                  </View>
-
-                  {/* Options */}
-                  <View className="px-6 pb-8">
-                    {genderOptions.map((option) => (
-                      <TouchableOpacity
-                        key={option.value}
-                        className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
-                        onPress={() => {
-                          handleInputChange(option.value, "gender");
-                          setShowGenderPicker(false);
-                        }}
-                      >
-                        <Typography variant="body1" className="text-gray-900">
-                          {option.label}
-                        </Typography>
-                        {formData.gender === option.value && (
-                          <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
-                            <Typography
-                              variant="body2"
-                              className="text-white font-bold"
-                            >
-                              ✓
-                            </Typography>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            </Modal>
-
-            {/* State Picker Bottom Sheet */}
-            <Modal
-              visible={showStatePicker}
-              transparent={true}
-              animationType="slide"
-              onRequestClose={() => setShowStatePicker(false)}
-            >
-              <TouchableOpacity
-                className="flex-1 justify-end bg-black/50"
-                activeOpacity={1}
-                onPress={() => setShowStatePicker(false)}
-              >
-                <TouchableOpacity
-                  className="bg-white rounded-t-3xl shadow-lg"
-                  activeOpacity={1}
-                  onPress={() => {}}
-                >
-                  {/* Drag Handle */}
-                  <View className="items-center py-3">
-                    <View className="w-10 h-1 bg-gray-300 rounded-full" />
-                  </View>
-
-                  {/* Title */}
-                  <View className="px-6 pb-4">
-                    <Typography
-                      variant="h6"
-                      fontWeight="semibold"
-                      className="text-center"
-                    >
-                      Select State
-                    </Typography>
-                  </View>
-
-                  {/* Options */}
-                  <ScrollView className="max-h-80 px-6 pb-8">
-                    {usStates.map((state) => (
-                      <TouchableOpacity
-                        key={state.abbreviation}
-                        className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
-                        onPress={() => {
-                          handleInputChange(state.name, "state");
-                          setShowStatePicker(false);
-                        }}
-                      >
-                        <Typography variant="body1" className="text-gray-900">
-                          {state.name}
-                        </Typography>
-                        {formData.state === state.name && (
-                          <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
-                            <Typography
-                              variant="body2"
-                              className="text-white font-bold"
-                            >
-                              ✓
-                            </Typography>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            </Modal>
-          </ScrollView>
-        </>
-      )}
-    </SafeAreaView>
+          </View>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

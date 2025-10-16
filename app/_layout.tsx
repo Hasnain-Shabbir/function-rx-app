@@ -1,12 +1,22 @@
 import { SessionProvider, UserProvider, useSession } from "@/context";
 import { client } from "@/services/apolloClient";
 import { ApolloProvider } from "@apollo/client/react";
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 import ToastManager from "toastify-react-native";
 import "./global.css";
 import SplashScreenController from "./splash";
 
 export default function RootLayout() {
+  useEffect(() => {
+    const setNavigationBarStyle = async () => {
+      await NavigationBar.setButtonStyleAsync("dark");
+    };
+
+    setNavigationBarStyle();
+  }, []);
+
   return (
     <SessionProvider>
       <ApolloProvider client={client}>

@@ -11,7 +11,10 @@ import { isTokenExpired } from "@/utils/jwtUtils";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 const Profile = () => {
@@ -21,6 +24,7 @@ const Profile = () => {
     useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const checkBiometricStatus = React.useCallback(async () => {
     const enabled = await isBiometricEnabled();
@@ -134,6 +138,7 @@ const Profile = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           minHeight: "100%",
+          paddingBottom: 100 + insets.bottom,
         }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

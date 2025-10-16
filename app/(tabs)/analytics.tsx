@@ -1,10 +1,14 @@
 import { Typography } from "@/components";
 import React, { useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const Analytics = () => {
   const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -21,6 +25,7 @@ const Analytics = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           minHeight: "100%",
+          paddingBottom: 100 + insets.bottom,
         }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
