@@ -6,17 +6,17 @@ interface FetchSequentialExerciseResponse {
 }
 
 export const useSequentialExercise = (exerciseId: string | null) => {
-  const { data, loading, error } = useQuery<FetchSequentialExerciseResponse>(
-    FETCH_SEQUENTIAL_EXERCISE,
-    {
+  const { data, loading, error, refetch } =
+    useQuery<FetchSequentialExerciseResponse>(FETCH_SEQUENTIAL_EXERCISE, {
       variables: { fetchSequentialExerciseId: exerciseId },
       skip: !exerciseId,
-    }
-  );
+      fetchPolicy: "cache-and-network",
+    });
 
   return {
     data: data?.fetchSequentialExercise,
     loading,
     error,
+    refetch,
   };
 };

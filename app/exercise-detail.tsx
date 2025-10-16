@@ -34,7 +34,11 @@ const ExerciseDetail = () => {
     exerciseId: string;
   }>();
 
-  const { data: exercise, loading } = useSequentialExercise(exerciseId || null);
+  const {
+    data: exercise,
+    loading,
+    refetch,
+  } = useSequentialExercise(exerciseId || null);
 
   const [exerciseMedia, setExerciseMedia] = useState<
     { id: string; link: string; title: string; type: "image" | "video" }[]
@@ -64,12 +68,12 @@ const ExerciseDetail = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      // Simulate refresh - you can add actual exercise detail refresh logic here
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 1000);
+      if (refetch) {
+        await refetch();
+      }
     } catch (error) {
       console.error("Error refreshing exercise detail:", error);
+    } finally {
       setRefreshing(false);
     }
   };
