@@ -4,7 +4,7 @@ import { Input } from "@/components/Input/Input";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
 import { Link } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
   Keyboard,
@@ -12,6 +12,7 @@ import {
   Platform,
   RefreshControl,
   ScrollView,
+  TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -28,6 +29,10 @@ const Login = () => {
   const { authenticateWithBiometric, isBiometricEnabled } = useBiometricAuth();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Refs for input navigation
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     checkBiometricAvailability();
@@ -95,6 +100,7 @@ const Login = () => {
 
                 <View className="gap-4">
                   <Input
+                    ref={emailInputRef}
                     label="Email"
                     placeholder="Enter your email"
                     value={formData.email}
@@ -103,8 +109,11 @@ const Login = () => {
                     type="email"
                     isError={!!errors.email}
                     errorMessage={errors.email}
+                    returnKeyType="next"
+                    onSubmitEditing={() => passwordInputRef.current?.focus()}
                   />
                   <Input
+                    ref={passwordInputRef}
                     label="Password"
                     placeholder="Enter your password"
                     value={formData.password}
@@ -113,6 +122,8 @@ const Login = () => {
                     inputSize="md"
                     isError={!!errors.password}
                     errorMessage={errors.password}
+                    returnKeyType="done"
+                    onSubmitEditing={handleLoginSubmit}
                   />
                   <View className="items-start">
                     <Link href="/forgot-password" asChild>

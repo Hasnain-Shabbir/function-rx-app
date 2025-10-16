@@ -6,7 +6,15 @@ import InputOTP from "@/components/InputOTP/InputOTP";
 import useOtpVerification from "@/hooks/useOtpVerification";
 import { Link } from "expo-router";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const OtpVerification = () => {
@@ -27,45 +35,52 @@ const OtpVerification = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 items-center px-5 bg-misc">
-      <ScrollView
-        className="flex-1 w-full"
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Link href="/login" asChild>
-          <Button
-            variant="outline"
-            className="min-w-9 min-h-9 rounded-sm p-1 self-start mb-9"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1"
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="flex-1 items-center px-5 bg-misc">
+          <ScrollView
+            className="flex-1 w-full"
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "flex-start",
+              alignItems: "center",
+            }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
-            <ChevronLeft width={12} height={20} color="#838786" />
-          </Button>
-        </Link>
-        <View className="w-full max-w-sm shadow-lg gap-6 border border-borderLight p-4 rounded-2xl bg-white">
-          <View>
-            <Typography variant="h6" fontWeight="semibold">
-              2 Factor Authentication
-            </Typography>
-            <Typography variant="body1" className="text-medium mt-1">
-              Enter the code you have received on {"email"}
-            </Typography>
-          </View>
+            <Link href="/login" asChild>
+              <Button
+                variant="outline"
+                className="min-w-9 min-h-9 rounded-sm p-1 self-start mb-9"
+              >
+                <ChevronLeft width={12} height={20} color="#838786" />
+              </Button>
+            </Link>
+            <View className="w-full max-w-sm shadow-lg gap-6 border border-borderLight p-4 rounded-2xl bg-white">
+              <View>
+                <Typography variant="h6" fontWeight="semibold">
+                  2 Factor Authentication
+                </Typography>
+                <Typography variant="body1" className="text-medium mt-1">
+                  Enter the code you have received on {"email"}
+                </Typography>
+              </View>
 
-          <View className="gap-4">
-            <InputOTP slots={6} onChange={handleOTPChange} />
-            <Button size={"md"} onPress={handleOtpVerification}>
-              Send Code
-            </Button>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              <View className="gap-4">
+                <InputOTP slots={6} onChange={handleOTPChange} />
+                <Button size={"md"} onPress={handleOtpVerification}>
+                  Send Code
+                </Button>
+              </View>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

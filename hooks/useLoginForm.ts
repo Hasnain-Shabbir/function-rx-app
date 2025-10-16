@@ -81,14 +81,14 @@ const useLoginForm = () => {
           navigate.push("/otp-verification");
         },
         onError: (err) => {
-          console.error("error while logging in: ", err);
+          // console.error("error while logging in: ", err);
           Toast.error(err.message || "Login failed. Please try again.");
         },
       });
     } catch (error) {
       if (error instanceof Error) {
         Toast.error(error.message || "Login failed. Please try again.");
-        console.error("error while logging in: ", error);
+        // console.error("error while logging in: ", error);
       }
     }
   };
