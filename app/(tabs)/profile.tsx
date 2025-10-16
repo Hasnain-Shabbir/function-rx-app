@@ -125,7 +125,7 @@ const Profile = () => {
   return (
     <SafeAreaView className="flex-1 justify-center bg-misc">
       <View className="bg-white border-b border-borderLight">
-        <Typography variant="body1" className="text-center font-medium py-4">
+        <Typography variant="body1" className="text-center font-semibold py-4">
           Profile
         </Typography>
       </View>
