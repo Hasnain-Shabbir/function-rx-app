@@ -13,6 +13,7 @@ interface UserInfoCardProps {
   email: string;
   streak: number;
   personalBest: number;
+  imageUrl?: string | null;
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = ({
@@ -20,10 +21,11 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({
   email,
   streak,
   personalBest,
+  imageUrl,
 }) => {
   return (
     <View className="bg-white border pb-3 border-borderLight p-4 rounded-lg gap-4 flex items-center">
-      <Avatar size="4xl" />
+      <Avatar size="4xl" src={imageUrl || undefined} />
       <View className="flex items-center gap-1">
         <Typography variant="h6">{name}</Typography>
         <Typography variant="body2" className="text-medium">

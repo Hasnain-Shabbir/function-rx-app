@@ -1,4 +1,10 @@
-import { ProfileButtons, Typography, UserInfoCard } from "@/components";
+import {
+  ProfileButtons,
+  Skeleton,
+  Typography,
+  UserInfoCard,
+} from "@/components";
+import { useUser } from "@/context";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
 import { isTokenExpired } from "@/utils/jwtUtils";
@@ -10,6 +16,7 @@ import { Toast } from "toastify-react-native";
 
 const Profile = () => {
   const router = useRouter();
+  const { user, loading: userLoading, refetch: refetchUser } = useUser();
   const { enableBiometricLogin, disableBiometricLogin, isBiometricEnabled } =
     useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -106,7 +113,8 @@ const Profile = () => {
 
       // Refresh biometric status
       await checkBiometricStatus();
-      // You can add other profile data refresh logic here
+      // Refetch user data
+      await refetchUser();
     } catch (error) {
       console.error("Error refreshing profile:", error);
     } finally {
@@ -117,7 +125,7 @@ const Profile = () => {
   return (
     <SafeAreaView className="flex-1 justify-center bg-misc">
       <View className="bg-white border-b border-borderLight">
-        <Typography variant="body2" className="text-center py-3">
+        <Typography variant="body1" className="text-center font-medium py-4">
           Profile
         </Typography>
       </View>
@@ -131,12 +139,58 @@ const Profile = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <UserInfoCard
-          name="John Doe"
-          email="john.doe@example.com"
-          streak={8}
-          personalBest={110}
-        />
+        {userLoading ? (
+          <View className="bg-white border pb-3 border-borderLight p-4 rounded-lg gap-4 flex items-center">
+            <Skeleton width={72} height={72} borderRadius={40} />
+            <View className="flex items-center gap-2">
+              <Skeleton width={120} height={25} />
+              <Skeleton width={150} height={18} />
+
+              {/* Award badges skeleton */}
+              <View className="flex-row items-center justify-center">
+                <Skeleton width={100} height={34} borderRadius={4} />
+                <View style={{ marginLeft: -17 }}>
+                  <Skeleton width={40} height={34} borderRadius={4} />
+                </View>
+                {/* <View style={{ marginLeft: -17 }}>
+                  <Skeleton width={40} height={34} borderRadius={4} />
+                </View>
+                <View style={{ marginLeft: -17 }}>
+                  <Skeleton width={40} height={34} borderRadius={4} />
+                </View> */}
+              </View>
+            </View>
+
+            {/* Statistics skeleton */}
+            <View className="flex-row justify-between items-center">
+              <View className="w-1/2 items-center">
+                <View className="flex flex-row items-center">
+                  <Skeleton width={20} height={20} />
+                  <View style={{ marginLeft: 4 }}>
+                    <Skeleton width={20} height={20} />
+                  </View>
+                </View>
+                <View style={{ marginTop: 8 }}>
+                  <Skeleton width={40} height={12} />
+                </View>
+              </View>
+
+              <View className="w-px h-6 bg-gray-300 mx-2" />
+
+              <View className="w-1/2 items-center">
+                <Skeleton width={60} height={35} />
+              </View>
+            </View>
+          </View>
+        ) : (
+          <UserInfoCard
+            name={user?.fullName || "User"}
+            email={user?.email || ""}
+            streak={8}
+            personalBest={110}
+            imageUrl={user?.imageUrl}
+          />
+        )}
 
         <ProfileButtons
           onEditProfile={handleEditProfile}

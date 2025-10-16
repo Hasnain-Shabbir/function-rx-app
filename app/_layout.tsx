@@ -1,7 +1,4 @@
-import {
-  SessionProvider,
-  useSession,
-} from "@/context/SessionProvider/SessionProvider";
+import { SessionProvider, UserProvider, useSession } from "@/context";
 import { client } from "@/services/apolloClient";
 import { ApolloProvider } from "@apollo/client/react";
 import { Stack } from "expo-router";
@@ -13,9 +10,11 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <ApolloProvider client={client}>
-        <SplashScreenController />
-        <ToastManager />
-        <RootNavigator />
+        <UserProvider>
+          <SplashScreenController />
+          <ToastManager />
+          <RootNavigator />
+        </UserProvider>
       </ApolloProvider>
     </SessionProvider>
   );

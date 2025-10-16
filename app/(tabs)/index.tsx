@@ -1,19 +1,70 @@
-import { Avatar, StatCard, Typography } from "@/components";
+import { Avatar, Skeleton, StatCard, Typography } from "@/components";
 import { stats } from "@/constants/stats";
+import { useUser } from "@/context";
 import { useState } from "react";
 import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
+  const { user, loading, refetch } = useUser();
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate refresh - you can add actual data fetching here
-    setTimeout(() => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
+
+  // Show skeleton loading while user data is being fetched
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center bg-misc">
+        <ScrollView
+          className="flex-1 p-5"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            minHeight: "100%",
+          }}
+        >
+          <View className="flex-row justify-between items-center w-full gap-4">
+            <View>
+              <Typography
+                variant="body1"
+                fontWeight="semibold"
+                className="text-medium mb-1"
+              >
+                Welcome
+              </Typography>
+              <Skeleton width={120} height={24} />
+            </View>
+
+            <Skeleton width={48} height={48} borderRadius={40} />
+          </View>
+
+          <View className="mt-6">
+            <FlatList
+              data={stats}
+              numColumns={2}
+              scrollEnabled={false}
+              columnWrapperStyle={{ gap: 8 }}
+              contentContainerStyle={{ gap: 8 }}
+              renderItem={() => (
+                <View className="flex-1">
+                  <Skeleton width="100%" height={90} borderRadius={12} />
+                </View>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-misc">
@@ -37,14 +88,13 @@ export default function Index() {
               Welcome
             </Typography>
             <Typography variant="h6" fontWeight="semibold">
-              John Doe
+              {user?.fullName ||
+                `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                "User"}
             </Typography>
           </View>
 
-          <Avatar
-            size="xl"
-            src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg"
-          />
+          <Avatar size="xl" src={user?.imageUrl || undefined} />
         </View>
 
         <View className="mt-6">
