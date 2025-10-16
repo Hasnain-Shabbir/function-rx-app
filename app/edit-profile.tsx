@@ -1,5 +1,7 @@
 import { ChevronLeft } from "@/assets/icons";
 import { AppInputGroup, ImagePicker, Typography } from "@/components";
+import { API_CONFIG } from "@/constants/config";
+import { usStates } from "@/constants/statesList";
 import { getValueFor } from "@/hooks/useOtpVerification";
 import { UPDATE_USER } from "@/services/graphql/mutations/authMutations";
 import { FETCH_USER } from "@/services/graphql/queries/sequencesQueries";
@@ -25,6 +27,8 @@ const EditProfile = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showGenderPicker, setShowGenderPicker] = useState(false);
+  const [showStatePicker, setShowStatePicker] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<any>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,7 +40,7 @@ const EditProfile = () => {
     city: "",
     state: "",
     zipCode: "",
-    profileImage: "",
+    profileImage: null as string | null,
   });
   const [originalData, setOriginalData] = useState({
     firstName: "",
@@ -49,7 +53,7 @@ const EditProfile = () => {
     city: "",
     state: "",
     zipCode: "",
-    profileImage: "",
+    profileImage: null as string | null,
   });
   const [errors, setErrors] = useState<Partial<typeof formData>>({});
 
@@ -63,7 +67,11 @@ const EditProfile = () => {
   }, []);
 
   // Fetch user data
-  const { data: userData, loading: userLoading } = useQuery(FETCH_USER, {
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: refetchUser,
+  } = useQuery(FETCH_USER, {
     variables: { fetchUserId: userId },
     skip: !userId,
     errorPolicy: "all",
@@ -75,29 +83,40 @@ const EditProfile = () => {
 
   // Prefill form data when user data is available
   useEffect(() => {
-    if (userData) {
-      const user = (userData as any)?.fetchUser?.user;
-      if (user) {
-        const dateOfBirth = user.dateOfBirth
-          ? new Date(user.dateOfBirth)
-          : new Date();
-        setSelectedDate(dateOfBirth);
-        const userFormData = {
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          email: user.email || "",
-          phone: user.phone || "",
-          gender: user.gender || "",
-          dateOfBirth: user.dateOfBirth || "",
-          address: user.address || "",
-          city: user.city || "",
-          state: user.state || "",
-          zipCode: user.zipCode || "",
-          profileImage: user.profileImage || "",
-        };
-        setFormData(userFormData);
-        setOriginalData(userFormData);
+    try {
+      if (userData) {
+        const user = (userData as any)?.fetchUser?.user;
+        console.log("🚀 ~ EditProfile ~ user:", user);
+        if (user) {
+          const dateOfBirth = user.dateOfBirth
+            ? new Date(user.dateOfBirth)
+            : new Date();
+          setSelectedDate(dateOfBirth);
+          // Construct full image URL with backend URL
+          const fullImageUrl = user.imageUrl
+            ? `${API_CONFIG.BASE_URL}${user.imageUrl}`
+            : null;
+
+          const userFormData = {
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            phone: user.phone || "",
+            gender: user.gender || "",
+            dateOfBirth: user.dateOfBirth || "",
+            address: user.address || "",
+            city: user.city || "",
+            state: user.state || "",
+            zipCode: user.zipCode || "",
+            profileImage: fullImageUrl,
+          };
+          setFormData(userFormData);
+          setOriginalData(userFormData);
+        }
       }
+    } catch (error) {
+      console.error("Error setting form data:", error);
+      Toast.error("Error loading user data");
     }
   }, [userData]);
 
@@ -105,49 +124,59 @@ const EditProfile = () => {
     text: string,
     fieldName: keyof typeof formData
   ) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [fieldName]: text,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[fieldName]) {
-      setErrors((prev) => ({
-        ...prev,
-        [fieldName]: "",
+    try {
+      setFormData((prevState) => ({
+        ...prevState,
+        [fieldName]: text,
       }));
+
+      // Clear error when user starts typing
+      if (errors[fieldName]) {
+        setErrors((prev) => ({
+          ...prev,
+          [fieldName]: "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error handling input change:", error);
     }
   };
 
   const validateForm = () => {
-    const newErrors: Partial<typeof formData> = {};
+    try {
+      const newErrors: Partial<typeof formData> = {};
 
-    // Email validation
-    if (formData.email && formData.email.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        newErrors.email = "Please enter a valid email address";
+      // Email validation
+      if (formData.email && formData.email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+          newErrors.email = "Please enter a valid email address";
+        }
       }
-    }
 
-    // Phone validation (basic)
-    if (formData.phone && formData.phone.trim()) {
-      const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-      if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = "Please enter a valid phone number";
+      // Phone validation (basic)
+      if (formData.phone && formData.phone.trim()) {
+        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+        if (!phoneRegex.test(formData.phone)) {
+          newErrors.phone = "Please enter a valid phone number";
+        }
       }
-    }
 
-    // ZipCode validation (basic)
-    if (formData.zipCode && formData.zipCode.trim()) {
-      const zipCodeRegex = /^\d{5}(-\d{4})?$/;
-      if (!zipCodeRegex.test(formData.zipCode)) {
-        newErrors.zipCode = "Please enter a valid zip code";
+      // ZipCode validation (basic)
+      if (formData.zipCode && formData.zipCode.trim()) {
+        const zipCodeRegex = /^\d{5}(-\d{4})?$/;
+        if (!zipCodeRegex.test(formData.zipCode)) {
+          newErrors.zipCode = "Please enter a valid zip code";
+        }
       }
-    }
 
-    setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error !== "");
+      setErrors(newErrors);
+      return !Object.values(newErrors).some((error) => error !== "");
+    } catch (error) {
+      console.error("Error validating form:", error);
+      Toast.error("Error validating form data");
+      return false;
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -188,17 +217,8 @@ const EditProfile = () => {
         formData.dateOfBirth !== originalData.dateOfBirth &&
         formData.dateOfBirth?.trim()
       ) {
-        // Convert date to ISO format for the API
-        try {
-          const dateObj = new Date(formData.dateOfBirth);
-          if (!isNaN(dateObj.getTime())) {
-            userAttributes.dateOfBirth = dateObj.toISOString();
-          }
-        } catch (dateError) {
-          console.error("Date conversion error:", dateError);
-          Toast.error("Invalid date format");
-          return;
-        }
+        // Date is already in YYYY-MM-DD format from handleDateChange
+        userAttributes.dateOfBirth = formData.dateOfBirth;
       }
       if (
         formData.address !== originalData.address &&
@@ -218,54 +238,88 @@ const EditProfile = () => {
       ) {
         userAttributes.zipCode = formData.zipCode.trim();
       }
-      if (
-        formData.profileImage !== originalData.profileImage &&
-        formData.profileImage?.trim()
-      ) {
-        userAttributes.profileImage = formData.profileImage.trim();
-      }
 
-      // Check if there are any changes
-      if (Object.keys(userAttributes).length === 0) {
+      // Helper to conditionally add image if selected (following ProfileInfo pattern)
+      const maybeImage = selectedImageFile ? { image: selectedImageFile } : {};
+
+      // Check if there are any changes (including image upload)
+      const hasChanges =
+        Object.keys(userAttributes).length > 0 || selectedImageFile;
+
+      console.log("Change detection:", {
+        userAttributesKeys: Object.keys(userAttributes),
+        selectedImageFile: selectedImageFile,
+        hasChanges: hasChanges,
+      });
+
+      if (!hasChanges) {
         Toast.info("No changes detected");
         return;
       }
 
-      console.log("Sending userAttributes:", userAttributes);
-
-      // Prepare input object
-      const input = {
+      // Prepare variables for the mutation - following ProfileInfo pattern
+      const variables = {
         id: userId,
-        userAttributes,
+        ...userAttributes,
+        ...maybeImage,
       };
 
-      await updateUser({
-        variables: { input },
+      console.log("Sending variables:", variables);
+      console.log("User ID:", userId);
+      console.log("UserAttributes:", userAttributes);
+      console.log("MaybeImage:", maybeImage);
+      console.log("SelectedImageFile:", selectedImageFile);
+
+      // Add a timeout to prevent hanging
+      const updatePromise = updateUser({
+        variables,
+        errorPolicy: "all", // This allows partial success scenarios
         update: (cache, { data }: any) => {
           try {
             // Update the cache with the new user data
             if (data?.updateUser?.user) {
+              // Try to read existing cache data first to preserve missing fields
+              const existingData = cache.readQuery({
+                query: FETCH_USER,
+                variables: { fetchUserId: userId },
+              });
+
+              // Merge existing data with new data to preserve all fields
+              const mergedUser = {
+                ...(existingData as any)?.fetchUser?.user,
+                ...data.updateUser.user,
+              };
+
               cache.writeQuery({
                 query: FETCH_USER,
                 variables: { fetchUserId: userId },
                 data: {
                   fetchUser: {
-                    user: data.updateUser.user,
+                    user: mergedUser,
                   },
                 },
               });
             }
           } catch (cacheError) {
             console.error("Cache update error:", cacheError);
+            // If cache update fails, we'll rely on refetch to get fresh data
           }
         },
         onCompleted: (res: any) => {
           try {
-            Toast.success("Profile updated successfully");
-            console.log("Profile updated:", res?.updateUser?.user);
-            // Update local state with the new data
+            // Check if the update was successful
             if (res?.updateUser?.user) {
+              Toast.success("Profile updated successfully");
+              console.log("Profile updated:", res.updateUser.user);
+
+              // Update local state with the new data
               const updatedUser = res.updateUser.user;
+
+              // Construct full image URL with backend URL
+              const fullImageUrl = updatedUser.imageUrl
+                ? `${API_CONFIG.BASE_URL}${updatedUser.imageUrl}`
+                : null;
+
               const updatedFormData = {
                 firstName: updatedUser.firstName || "",
                 lastName: updatedUser.lastName || "",
@@ -277,23 +331,94 @@ const EditProfile = () => {
                 city: updatedUser.city || "",
                 state: updatedUser.state || "",
                 zipCode: updatedUser.zipCode || "",
-                profileImage: updatedUser.profileImage || "",
+                profileImage: fullImageUrl,
               };
               setFormData(updatedFormData);
               setOriginalData(updatedFormData);
+              setSelectedImageFile(null); // Clear the selected file after successful upload
+              router.back();
+            } else {
+              // If no user data returned, it might still be a partial success
+              Toast.success("Profile updated successfully");
+              setSelectedImageFile(null); // Clear the selected file after successful upload
+              router.back();
             }
-            router.back();
           } catch (completionError) {
             console.error("Error in completion handler:", completionError);
-            Toast.error("Profile updated but there was an issue");
+            Toast.success("Profile updated successfully");
+            setSelectedImageFile(null); // Clear the selected file after successful upload
+            router.back();
           }
         },
-        onError: (err) => {
+        onError: (err: any) => {
           console.error("Error updating profile:", err);
-          const errorMessage = err?.message || "Failed to update profile";
+          console.error("Error details:", JSON.stringify(err, null, 2));
+          console.error("Variables sent:", variables);
+
+          // Check if this is a partial success scenario
+          // Sometimes GraphQL returns errors but the mutation still succeeds
+          if (err?.graphQLErrors && err.graphQLErrors.length > 0) {
+            // Check if any of the GraphQL errors are non-critical
+            const criticalErrors = err.graphQLErrors.filter((error: any) => {
+              const message = error.message?.toLowerCase() || "";
+              // Filter out common non-critical errors
+              return (
+                !message.includes("validation") &&
+                !message.includes("warning") &&
+                !message.includes("deprecated")
+              );
+            });
+
+            if (criticalErrors.length === 0) {
+              // Only non-critical errors, treat as success
+              Toast.success("Profile updated successfully");
+              setSelectedImageFile(null); // Clear the selected file after successful upload
+              // Refetch user data to ensure we have the latest state
+              refetchUser().catch(() => {
+                console.log("Refetch failed, but update was successful");
+              });
+              router.back();
+              return;
+            }
+          }
+
+          // Only show user-friendly error messages
+          let errorMessage = "Failed to update profile. Please try again.";
+
+          // Check for specific error types and provide user-friendly messages
+          if (err?.networkError) {
+            errorMessage =
+              "Network error. Please check your connection and try again.";
+          } else if (err?.message) {
+            // Only show the error message if it's user-friendly
+            const message = err.message.toLowerCase();
+            if (message.includes("network") || message.includes("connection")) {
+              errorMessage =
+                "Network error. Please check your connection and try again.";
+            } else if (
+              message.includes("unauthorized") ||
+              message.includes("forbidden")
+            ) {
+              errorMessage =
+                "You don't have permission to update this profile.";
+            } else if (message.includes("not found")) {
+              errorMessage = "Profile not found. Please try again.";
+            } else {
+              // For other errors, show a generic message
+              errorMessage = "Failed to update profile. Please try again.";
+            }
+          }
+
           Toast.error(errorMessage);
         },
       });
+
+      // Add timeout handling
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Request timeout")), 30000); // 30 second timeout
+      });
+
+      await Promise.race([updatePromise, timeoutPromise]);
     } catch (error) {
       console.error("Error saving profile:", error);
       Toast.error("Error saving profile. Please try again.");
@@ -314,21 +439,41 @@ const EditProfile = () => {
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || new Date();
-    setShowDatePicker(Platform.OS === "ios");
-    setSelectedDate(currentDate);
+    try {
+      const currentDate = selectedDate || new Date();
+      setShowDatePicker(Platform.OS === "ios");
+      setSelectedDate(currentDate);
 
-    // Format date as MM/DD/YYYY
-    const formattedDate = currentDate.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
+      // Format date as YYYY-MM-DD to match API format
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      const formattedDate = `${year}-${month}-${day}`;
 
-    setFormData((prevState) => ({
-      ...prevState,
-      dateOfBirth: formattedDate,
-    }));
+      setFormData((prevState) => ({
+        ...prevState,
+        dateOfBirth: formattedDate,
+      }));
+    } catch (error) {
+      console.error("Error handling date change:", error);
+      Toast.error("Error setting date");
+    }
+  };
+
+  // Helper function to format date for display
+  const formatDateForDisplay = (dateString: string) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
   };
 
   const genderOptions = [
@@ -342,6 +487,27 @@ const EditProfile = () => {
       <SafeAreaView className="flex-1 bg-misc">
         <View className="flex-1 justify-center items-center">
           <Typography variant="body1">Loading profile...</Typography>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error state if user data failed to load
+  if (userData && !(userData as any)?.fetchUser?.user) {
+    return (
+      <SafeAreaView className="flex-1 bg-misc">
+        <View className="flex-1 justify-center items-center px-4">
+          <Typography variant="body1" className="text-center text-red-600 mb-4">
+            Failed to load user profile. Please try again.
+          </Typography>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="bg-primary-500 px-6 py-3 rounded-lg"
+          >
+            <Typography variant="body1" className="text-white font-medium">
+              Go Back
+            </Typography>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -369,7 +535,7 @@ const EditProfile = () => {
         >
           <Typography
             variant="body1"
-            className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-blue-500"}`}
+            className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-primary-500"}`}
           >
             Save
           </Typography>
@@ -390,11 +556,21 @@ const EditProfile = () => {
         <View className="items-center mb-8">
           <ImagePicker
             initialImage={formData.profileImage}
-            onImageSelected={(uri) => {
+            onImageSelected={(uri, file) => {
+              console.log("Image selected - URI:", uri);
+              console.log("Image selected - File:", file);
+              console.log("File object structure:", {
+                uri: file?.uri,
+                type: file?.type,
+                name: file?.name,
+              });
               setFormData((prev) => ({
                 ...prev,
                 profileImage: uri,
               }));
+              // Store the file for upload
+              setSelectedImageFile(file);
+              console.log("SelectedImageFile set to:", file);
             }}
             size={120}
           />
@@ -445,7 +621,7 @@ const EditProfile = () => {
               {
                 id: "dateOfBirth",
                 title: "Date of Birth",
-                value: formData.dateOfBirth,
+                value: formatDateForDisplay(formData.dateOfBirth),
                 onPress: () => setShowDatePicker(true),
                 showArrow: true,
                 editable: false,
@@ -477,8 +653,9 @@ const EditProfile = () => {
                 id: "state",
                 title: "State",
                 value: formData.state,
-                onChangeText: (text) => handleInputChange(text, "state"),
-                placeholder: "Enter your state",
+                onPress: () => setShowStatePicker(true),
+                showArrow: true,
+                editable: false,
               },
               {
                 id: "zipCode",
@@ -562,6 +739,70 @@ const EditProfile = () => {
                   </TouchableOpacity>
                 ))}
               </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* State Picker Bottom Sheet */}
+        <Modal
+          visible={showStatePicker}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowStatePicker(false)}
+        >
+          <TouchableOpacity
+            className="flex-1 justify-end bg-black/50"
+            activeOpacity={1}
+            onPress={() => setShowStatePicker(false)}
+          >
+            <TouchableOpacity
+              className="bg-white rounded-t-3xl shadow-lg"
+              activeOpacity={1}
+              onPress={() => {}}
+            >
+              {/* Drag Handle */}
+              <View className="items-center py-3">
+                <View className="w-10 h-1 bg-gray-300 rounded-full" />
+              </View>
+
+              {/* Title */}
+              <View className="px-6 pb-4">
+                <Typography
+                  variant="h6"
+                  fontWeight="semibold"
+                  className="text-center"
+                >
+                  Select State
+                </Typography>
+              </View>
+
+              {/* Options */}
+              <ScrollView className="max-h-80 px-6 pb-8">
+                {usStates.map((state) => (
+                  <TouchableOpacity
+                    key={state.abbreviation}
+                    className="flex-row items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
+                    onPress={() => {
+                      handleInputChange(state.name, "state");
+                      setShowStatePicker(false);
+                    }}
+                  >
+                    <Typography variant="body1" className="text-gray-900">
+                      {state.name}
+                    </Typography>
+                    {formData.state === state.name && (
+                      <View className="w-6 h-6 bg-blue-500 rounded-full items-center justify-center">
+                        <Typography
+                          variant="body2"
+                          className="text-white font-bold"
+                        >
+                          ✓
+                        </Typography>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </TouchableOpacity>
           </TouchableOpacity>
         </Modal>

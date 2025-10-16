@@ -1,11 +1,10 @@
-import { Typography } from "@/components";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Alert, Image, TouchableOpacity, View } from "react-native";
 
 interface ImagePickerProps {
-  onImageSelected?: (uri: string) => void;
-  initialImage?: string;
+  onImageSelected?: (uri: string, file?: any) => void;
+  initialImage?: string | null;
   size?: number;
   className?: string;
 }
@@ -45,8 +44,16 @@ const ImagePickerComponent: React.FC<ImagePickerProps> = ({
 
     if (!result.canceled && result.assets[0]) {
       const imageUri = result.assets[0].uri;
+
+      // Create file object for upload
+      const file = {
+        uri: imageUri,
+        type: "image/jpeg",
+        name: `profile_${Date.now()}.jpg`,
+      };
+
       setSelectedImage(imageUri);
-      onImageSelected?.(imageUri);
+      onImageSelected?.(imageUri, file);
     }
   };
 
@@ -85,8 +92,16 @@ const ImagePickerComponent: React.FC<ImagePickerProps> = ({
 
     if (!result.canceled && result.assets[0]) {
       const imageUri = result.assets[0].uri;
+
+      // Create file object for upload
+      const file = {
+        uri: imageUri,
+        type: "image/jpeg",
+        name: `profile_${Date.now()}.jpg`,
+      };
+
       setSelectedImage(imageUri);
-      onImageSelected?.(imageUri);
+      onImageSelected?.(imageUri, file);
     }
   };
 
@@ -109,14 +124,12 @@ const ImagePickerComponent: React.FC<ImagePickerProps> = ({
               resizeMode="cover"
             />
           ) : (
-            <View
-              className="bg-gray-200 rounded-full items-center justify-center"
+            <Image
+              source={require("@/assets/images/user-avatar.png")}
               style={{ width: size, height: size }}
-            >
-              <Typography variant="body2" className="text-gray-500">
-                No Image
-              </Typography>
-            </View>
+              className="rounded-full"
+              resizeMode="cover"
+            />
           )}
 
           {/* Camera Icon Overlay */}
