@@ -17,6 +17,7 @@ export interface AppInputItem {
   titleClassName?: string;
   valueClassName?: string;
   testID?: string;
+  errorMessage?: string;
 }
 
 export interface AppInputGroupProps {
@@ -74,6 +75,13 @@ const AppInputGroup = React.forwardRef<View, AppInputGroupProps>(
                   testID={input.testID}
                   className="border-0 bg-transparent rounded-none"
                 />
+                {input.errorMessage && (
+                  <View className="px-4 pb-2">
+                    <Text className="text-sm text-red-500">
+                      {input.errorMessage}
+                    </Text>
+                  </View>
+                )}
               </View>
               {index < inputs.length - 1 && (
                 <View className={cn("h-px bg-gray-200", separatorClassName)} />

@@ -56,6 +56,33 @@ const EditProfile = () => {
     profileImage: null as string | null,
   });
   const [errors, setErrors] = useState<Partial<typeof formData>>({});
+  const [phoneError, setPhoneError] = useState<string | undefined>(undefined);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  // Helper for phone validation - similar to ProfileInfo implementation
+  const validateUSPhoneNumber = (phoneValue: string | undefined): boolean => {
+    if (!phoneValue || phoneValue.trim() === "") return false;
+
+    // Remove all non-digit characters for validation
+    const digitsOnly = phoneValue.replace(/\D/g, "");
+
+    // US phone numbers should have 10 digits (without country code) or 11 digits (with country code 1)
+    if (digitsOnly.length === 10) {
+      // Format: (XXX) XXX-XXXX or XXX-XXX-XXXX or XXXXXXXXXX
+      return true;
+    } else if (digitsOnly.length === 11 && digitsOnly.startsWith("1")) {
+      // Format: +1 (XXX) XXX-XXXX or 1-XXX-XXX-XXXX
+      return true;
+    }
+
+    return false;
+  };
+
+  // Helper to check if phone is required and valid
+  const validateRequiredPhone = (phoneValue: string | undefined): boolean => {
+    if (!phoneValue || phoneValue.trim() === "") return false;
+    return validateUSPhoneNumber(phoneValue);
+  };
 
   // Fetch user ID from storage
   useEffect(() => {
@@ -137,6 +164,23 @@ const EditProfile = () => {
           [fieldName]: "",
         }));
       }
+
+      // Handle phone validation
+      if (fieldName === "phone") {
+        if (hasSubmitted) {
+          // Revalidate on change only after submit attempt
+          const valid = validateRequiredPhone(text);
+          if (!valid) {
+            if (!text || text.trim() === "") {
+              setPhoneError("Phone number is required");
+            } else {
+              setPhoneError("Please enter a valid US phone number");
+            }
+          } else {
+            setPhoneError(undefined);
+          }
+        }
+      }
     } catch (error) {
       console.error("Error handling input change:", error);
     }
@@ -154,11 +198,13 @@ const EditProfile = () => {
         }
       }
 
-      // Phone validation (basic)
-      if (formData.phone && formData.phone.trim()) {
-        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-        if (!phoneRegex.test(formData.phone)) {
-          newErrors.phone = "Please enter a valid phone number";
+      // Phone validation - required field
+      const valid = validateRequiredPhone(formData.phone);
+      if (!valid) {
+        if (!formData.phone || formData.phone.trim() === "") {
+          newErrors.phone = "Phone number is required";
+        } else {
+          newErrors.phone = "Please enter a valid US phone number";
         }
       }
 
@@ -180,6 +226,20 @@ const EditProfile = () => {
   };
 
   const handleSaveChanges = async () => {
+    setHasSubmitted(true);
+
+    // Validate phone number specifically - required field
+    const valid = validateRequiredPhone(formData.phone);
+    if (!valid) {
+      if (!formData.phone || formData.phone.trim() === "") {
+        setPhoneError("Phone number is required");
+      } else {
+        setPhoneError("Please enter a valid US phone number");
+      }
+      return;
+    }
+    setPhoneError(undefined);
+
     if (!validateForm()) {
       return;
     }
@@ -428,10 +488,51 @@ const EditProfile = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      // Simulate refresh - you can add actual edit profile refresh logic here
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 1000);
+      // Refetch user data to get the latest information
+      if (userId) {
+        const result = await refetchUser();
+
+        // Reset form data with fresh user data
+        if (result.data) {
+          const user = (result.data as any)?.fetchUser?.user;
+          if (user) {
+            const dateOfBirth = user.dateOfBirth
+              ? new Date(user.dateOfBirth)
+              : new Date();
+            setSelectedDate(dateOfBirth);
+
+            // Construct full image URL with backend URL
+            const fullImageUrl = user.imageUrl
+              ? `${API_CONFIG.BASE_URL}${user.imageUrl}`
+              : null;
+
+            const userFormData = {
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
+              email: user.email || "",
+              phone: user.phone || "",
+              gender: user.gender || "",
+              dateOfBirth: user.dateOfBirth || "",
+              address: user.address || "",
+              city: user.city || "",
+              state: user.state || "",
+              zipCode: user.zipCode || "",
+              profileImage: fullImageUrl,
+            };
+
+            // Reset form data and original data with fresh data
+            setFormData(userFormData);
+            setOriginalData(userFormData);
+
+            // Clear any validation errors and selected image file
+            setErrors({});
+            setPhoneError(undefined);
+            setSelectedImageFile(null);
+            setHasSubmitted(false);
+          }
+        }
+      }
+      setRefreshing(false);
     } catch (error) {
       console.error("Error refreshing edit profile page:", error);
       setRefreshing(false);
@@ -609,6 +710,7 @@ const EditProfile = () => {
                 value: formData.phone,
                 onChangeText: (text) => handleInputChange(text, "phone"),
                 placeholder: "Enter your phone number",
+                errorMessage: hasSubmitted ? phoneError : undefined,
               },
               {
                 id: "gender",
