@@ -105,7 +105,7 @@ const EditProfileSkeleton = () => {
               <View className="flex-row items-start h-16 justify-between py-4 px-4">
                 <Skeleton width={70} height={16} />
                 <View className="flex-1 ml-4">
-                  <Skeleton width="100%" height={60} />
+                  <Skeleton width="100%" height={16} />
                 </View>
               </View>
 

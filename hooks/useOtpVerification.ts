@@ -1,4 +1,5 @@
 import { useSession } from "@/context/SessionProvider/SessionProvider";
+import { useUser } from "@/context/UserProvider/UserProvider";
 import { useStorageState } from "@/hooks/useStorageState";
 import { VALIDATE_OTP } from "@/services/graphql/mutations/authMutations";
 import { useMutation } from "@apollo/client/react";
@@ -23,6 +24,7 @@ export async function removeValue(key: string) {
 const useOtpVerification = () => {
   const [otp, setOtp] = useState("");
   const { login } = useSession();
+  const { refreshUserData } = useUser();
   const [, setUserType] = useStorageState("user_type");
   const [, setUserId] = useStorageState("user_id");
 
@@ -59,6 +61,11 @@ const useOtpVerification = () => {
             login(token);
             setUserType(userRole);
             setUserId(user.id);
+
+            // Trigger user data refresh after setting user ID
+            setTimeout(() => {
+              refreshUserData();
+            }, 100);
 
             Toast.success("You are logged in successfully");
 

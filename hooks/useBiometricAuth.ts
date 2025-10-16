@@ -1,3 +1,5 @@
+import { useSession } from "@/context/SessionProvider/SessionProvider";
+import { useUser } from "@/context/UserProvider/UserProvider";
 import { isTokenExpired } from "@/utils/jwtUtils";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
@@ -7,6 +9,8 @@ import { setStorageItemAsync } from "./useStorageState";
 
 export const useBiometricAuth = () => {
   const router = useRouter();
+  const { login } = useSession();
+  const { refreshUserData } = useUser();
 
   const checkBiometricSupport = async () => {
     try {
@@ -81,6 +85,13 @@ export const useBiometricAuth = () => {
               return false;
             } else {
               // Token is valid, restore the session
+              login(storedToken);
+
+              // Trigger user data refresh after restoring session
+              setTimeout(() => {
+                refreshUserData();
+              }, 100);
+
               router.push("/");
               return true;
             }
