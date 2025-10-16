@@ -1,5 +1,10 @@
 import { ChevronLeft } from "@/assets/icons";
-import { AppInputGroup, ImagePicker, Typography } from "@/components";
+import {
+  AppInputGroup,
+  EditProfileSkeleton,
+  ImagePicker,
+  Typography,
+} from "@/components";
 import { API_CONFIG } from "@/constants/config";
 import { usStates } from "@/constants/statesList";
 import { getValueFor } from "@/hooks/useOtpVerification";
@@ -584,13 +589,7 @@ const EditProfile = () => {
 
   // Show loading state while user data is being fetched
   if (userLoading) {
-    return (
-      <SafeAreaView className="flex-1 bg-misc">
-        <View className="flex-1 justify-center items-center">
-          <Typography variant="body1">Loading profile...</Typography>
-        </View>
-      </SafeAreaView>
-    );
+    return <EditProfileSkeleton />;
   }
 
   // Show error state if user data failed to load
