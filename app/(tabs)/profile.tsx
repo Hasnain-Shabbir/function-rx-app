@@ -1,9 +1,11 @@
 import {
+  AppModal,
   ProfileButtons,
   Skeleton,
   Typography,
   UserInfoCard,
 } from "@/components";
+import { Button } from "@/components/Button/Button";
 import { useUser } from "@/context";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
@@ -24,6 +26,7 @@ const Profile = () => {
     useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const insets = useSafeAreaInsets();
 
   const checkBiometricStatus = React.useCallback(async () => {
@@ -59,7 +62,11 @@ const Profile = () => {
     router.push("/change-password");
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
     try {
       // Check if biometric login is enabled
       const biometricEnabled = await getValueFor("biometric_enabled");
@@ -85,11 +92,13 @@ const Profile = () => {
         Toast.success("Logged out successfully");
       }
 
-      // Navigate to login screen
+      // Close modal and navigate to login screen
+      setShowLogoutModal(false);
       router.replace("/login");
     } catch (error) {
       console.error("Error during logout:", error);
       Toast.error("Error during logout. Please try again.");
+      setShowLogoutModal(false);
     }
   };
 
@@ -205,6 +214,32 @@ const Profile = () => {
           biometricEnabled={biometricEnabled}
         />
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <AppModal
+        visible={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      >
+        <AppModal.Header title="Confirm Logout" />
+        <AppModal.Body showBorders={false}>
+          <Typography variant="body2" className="text-gray-600">
+            Are you sure you want to logout? You will need to login again to
+            access your account.
+          </Typography>
+        </AppModal.Body>
+        <AppModal.Footer showDefaultClose={false}>
+          <Button
+            size="sm"
+            variant="outline"
+            onPress={() => setShowLogoutModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button size="sm" variant="danger" onPress={handleConfirmLogout}>
+            Logout
+          </Button>
+        </AppModal.Footer>
+      </AppModal>
     </SafeAreaView>
   );
 };
