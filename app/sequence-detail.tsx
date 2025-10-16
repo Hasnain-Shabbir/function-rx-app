@@ -193,7 +193,7 @@ const SequenceDetail = () => {
     return (
       <SafeAreaView className="flex-1 bg-misc">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-red-500 text-center">
+          <Text className="text-danger-500 text-center">
             {error?.message || "Sequence not found"}
           </Text>
           <Button

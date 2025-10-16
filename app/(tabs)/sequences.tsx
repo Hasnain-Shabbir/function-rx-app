@@ -44,6 +44,8 @@ const Sequences = () => {
         return "success";
       case "pending":
         return "warning";
+      case "incomplete":
+        return "danger";
       default:
         return "info";
     }
@@ -201,7 +203,10 @@ const Sequences = () => {
                   <View className="flex-row justify-between items-center mb-3">
                     <Text className="font-semibold text-gray-900">Status:</Text>
                     <Tag
-                      title={sequence.status}
+                      title={
+                        sequence.status.charAt(0).toUpperCase() +
+                        sequence.status.slice(1).toLowerCase()
+                      }
                       type={getStatusType(sequence.status) as any}
                       dot={true}
                       size="sm"

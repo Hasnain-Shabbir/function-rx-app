@@ -8,11 +8,20 @@ import { API_CONFIG } from "@/constants/config";
 import { useSequentialExercise } from "@/hooks/useSequentialExercise";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  Image,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import YoutubePlayer from "react-native-youtube-iframe";
 
 // Simple user role check - assuming client role for now
 const isClient = true;
@@ -25,15 +34,15 @@ const ExerciseDetail = () => {
     exerciseId: string;
   }>();
 
-  const {
-    data: exercise,
-    loading,
-    error,
-  } = useSequentialExercise(exerciseId || null);
+  const { data: exercise, loading } = useSequentialExercise(exerciseId || null);
 
   const [exerciseMedia, setExerciseMedia] = useState<
-    { id: string; link: string; title: string }[]
+    { id: string; link: string; title: string; type: "image" | "video" }[]
   >([]);
+
+  // Video modal state
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   // Utility function to format text (remove underscores, capitalize first letter of each word)
   const formatText = (text: string | undefined): string => {
@@ -42,6 +51,14 @@ const ExerciseDetail = () => {
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
+  };
+
+  // Utility function to extract YouTube video ID from URL
+  const getYouTubeVideoId = (url: string): string | null => {
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
   };
 
   const onRefresh = async () => {
@@ -57,6 +74,17 @@ const ExerciseDetail = () => {
     }
   };
 
+  const handleVideoPress = (videoUrl: string) => {
+    const videoId = getYouTubeVideoId(videoUrl);
+    setSelectedVideoId(videoId);
+    setVideoModalVisible(true);
+  };
+
+  const closeVideoModal = () => {
+    setVideoModalVisible(false);
+    setSelectedVideoId(null);
+  };
+
   useEffect(() => {
     // Reset media state when exercise changes
     setExerciseMedia([]);
@@ -70,6 +98,7 @@ const ExerciseDetail = () => {
             id: photo.id,
             link: `${API_CONFIG.BASE_URL}${photo.url}`,
             title: "",
+            type: "image" as const,
           },
         ]);
       }
@@ -83,6 +112,7 @@ const ExerciseDetail = () => {
           id: "video-" + exercise.exercise.id,
           link: exercise.exercise.videoUrl,
           title: "Video",
+          type: "video" as const,
         },
       ]);
     }
@@ -263,15 +293,35 @@ const ExerciseDetail = () => {
               className="gap-3"
             >
               {exerciseMedia.map((media) => (
-                <View key={media.id} className="mr-3">
-                  {media.title === "Video" ? (
-                    <View className="w-64 h-48 bg-gray-200 rounded-lg items-center justify-center">
-                      <Text className="text-gray-500">Video: {media.link}</Text>
-                    </View>
+                <View
+                  key={media.id}
+                  className="mr-3 w-64 h-48 rounded-lg overflow-hidden"
+                >
+                  {media.type === "video" ? (
+                    <TouchableOpacity
+                      onPress={() => handleVideoPress(media.link)}
+                      className="w-full h-full bg-gray-900 rounded-lg items-center justify-center relative"
+                    >
+                      <YoutubePlayer
+                        height={192}
+                        width={256}
+                        videoId={getYouTubeVideoId(media.link) || ""}
+                        play={false}
+                        webViewStyle={{ borderRadius: 8, overflow: "hidden" }}
+                      />
+                      {/* Play button overlay */}
+                      <View className="absolute inset-0 items-center justify-center bg-black bg-opacity-30 rounded-lg">
+                        <View className="w-16 h-16 bg-white bg-opacity-90 rounded-full items-center justify-center">
+                          <Text className="text-black text-2xl font-bold">
+                            ▶
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
                   ) : (
                     <Image
                       source={{ uri: media.link }}
-                      className="w-64 h-48 rounded-lg"
+                      className="w-full h-full rounded-lg"
                       resizeMode="cover"
                     />
                   )}
@@ -356,6 +406,34 @@ const ExerciseDetail = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Video Modal */}
+      <Modal
+        visible={videoModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeVideoModal}
+      >
+        <View className="flex-1 bg-black bg-opacity-70 items-center justify-center px-4">
+          <View className="w-full max-w-md">
+            {selectedVideoId && (
+              <YoutubePlayer
+                height={300}
+                width="100%"
+                videoId={selectedVideoId}
+                play={true}
+                webViewStyle={{ borderRadius: 8 }}
+              />
+            )}
+          </View>
+          <TouchableOpacity
+            onPress={closeVideoModal}
+            className="mt-6 w-12 h-12 bg-white bg-opacity-90 rounded-full items-center justify-center"
+          >
+            <Text className="text-black text-2xl font-bold">×</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
