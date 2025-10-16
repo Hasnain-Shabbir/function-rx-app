@@ -5,7 +5,12 @@ import { Input } from "@/components/Input/Input";
 import useChangePassword from "@/hooks/useChangePassword";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -39,18 +44,18 @@ const ChangePassword = () => {
   return (
     <SafeAreaView className="flex-1 bg-misc">
       {/* Header */}
-      <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200">
-        <Button
-          variant="outline"
-          className="min-w-9 min-h-9 rounded-sm p-1"
-          onPress={() => router.back()}
-        >
-          <ChevronLeft width={12} height={20} color="#838786" />
-        </Button>
-        <Typography variant="h6" fontWeight="semibold">
+
+      <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center justify-between">
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => router.back()} className="p-2">
+          <ChevronLeft width={14} height={14} color="#6B7280" />
+        </TouchableOpacity>
+
+        {/* Title */}
+        <Typography variant="body1" className="font-semibold text-gray-900">
           Change Password
         </Typography>
-        <View className="w-9" />
+        <View className="w-4" />
       </View>
 
       <ScrollView
@@ -115,31 +120,6 @@ const ChangePassword = () => {
                 isError={!!errors.confirmPassword}
                 errorMessage={errors.confirmPassword}
               />
-            </View>
-
-            {/* Password Requirements */}
-            <View className="bg-gray-50 p-4 rounded-lg">
-              <Typography
-                variant="body3"
-                fontWeight="medium"
-                className="text-gray-700 mb-2"
-              >
-                Password Requirements:
-              </Typography>
-              <View className="gap-1">
-                <Typography variant="caption" className="text-gray-600">
-                  • At least 8 characters long
-                </Typography>
-                <Typography variant="caption" className="text-gray-600">
-                  • Contains letters (a-z, A-Z)
-                </Typography>
-                <Typography variant="caption" className="text-gray-600">
-                  • Contains numbers (0-9)
-                </Typography>
-                <Typography variant="caption" className="text-gray-600">
-                  • Contains special characters (!@#$%^&*)
-                </Typography>
-              </View>
             </View>
 
             {/* Submit Button */}
