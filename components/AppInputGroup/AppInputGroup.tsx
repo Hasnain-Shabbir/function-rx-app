@@ -11,6 +11,7 @@ export interface AppInputItem {
   onChangeText?: (text: string) => void;
   onPress?: () => void;
   editable?: boolean;
+  disabled?: boolean;
   showArrow?: boolean;
   multiline?: boolean;
   numberOfLines?: number;
@@ -68,6 +69,7 @@ const AppInputGroup = React.forwardRef<View, AppInputGroupProps>(
                   onChangeText={input.onChangeText}
                   onPress={input.onPress}
                   editable={input.editable}
+                  disabled={input.disabled}
                   showArrow={input.showArrow}
                   multiline={input.multiline}
                   numberOfLines={input.numberOfLines}

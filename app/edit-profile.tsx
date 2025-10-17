@@ -729,6 +729,7 @@ const EditProfile = () => {
                           handleInputChange(text, "email"),
                         placeholder: "Enter your email",
                         editable: false,
+                        disabled: true,
                       },
                       {
                         id: "phone",

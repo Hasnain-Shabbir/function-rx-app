@@ -9,6 +9,7 @@ export interface AppInputProps {
   onChangeText?: (text: string) => void;
   onPress?: () => void;
   editable?: boolean;
+  disabled?: boolean;
   showArrow?: boolean;
   multiline?: boolean;
   numberOfLines?: number;
@@ -28,6 +29,7 @@ const AppInput = React.forwardRef<TextInput, AppInputProps>(
       onChangeText,
       onPress,
       editable = true,
+      disabled = false,
       showArrow = false,
       multiline = false,
       numberOfLines = 1,
@@ -60,7 +62,7 @@ const AppInput = React.forwardRef<TextInput, AppInputProps>(
         className={cn(
           "flex-row items-center justify-between py-4 px-4 bg-white rounded-lg border border-gray-200",
           isFocused && "border-primary-500 bg-primary-50",
-          !editable && "opacity-60",
+          disabled && "opacity-60",
           className
         )}
         testID={testID}
