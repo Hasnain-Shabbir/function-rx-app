@@ -43,8 +43,8 @@ const SupersetCard = ({
     if (!firstExercise) return { sets: 0, time: 0 };
 
     return {
-      sets: firstExercise.sets,
-      time: firstExercise.time,
+      sets: firstExercise.sets || 0,
+      time: firstExercise.time || 0,
     };
   };
 
@@ -94,21 +94,21 @@ const SupersetCard = ({
                   <View className="flex-row items-center mr-4">
                     <Text className="text-gray-400 mr-1">👤</Text>
                     <Text className="text-xs text-gray-600">
-                      {exercise.sets} sets
+                      {exercise.sets || 0} sets
                     </Text>
                   </View>
 
                   <View className="flex-row items-center mr-4">
                     <Text className="text-gray-400 mr-1">💬</Text>
                     <Text className="text-xs text-gray-600">
-                      {exercise.repetition} reps
+                      {exercise.repetition || 0} reps
                     </Text>
                   </View>
 
                   <View className="flex-row items-center">
                     <Text className="text-gray-400 mr-1">⏰</Text>
                     <Text className="text-xs text-gray-600">
-                      {exercise.time} min
+                      {exercise.time || 0} min
                     </Text>
                   </View>
                 </View>

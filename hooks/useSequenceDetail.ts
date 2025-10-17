@@ -83,9 +83,9 @@ export const useSequenceDetail = (
       };
     }
     return {
-      sets: item.sets,
-      reps: item.reps,
-      time: item.time,
+      sets: item.sets || 0,
+      reps: item.reps || 0,
+      time: item.time || 0,
     };
   };
 

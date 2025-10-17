@@ -281,8 +281,8 @@ const ExerciseDetail = () => {
             {exercise.name}
           </Typography>
           <ExerciseIconsBar
-            sets={exercise.sets || "N/A"}
-            reps={exercise.repetition || "N/A"}
+            sets={exercise.sets || 0}
+            reps={exercise.repetition || 0}
             duration={exercise.time || "N/A"}
             version={exercise.shortVersion ? "Short version" : "Long version"}
           />

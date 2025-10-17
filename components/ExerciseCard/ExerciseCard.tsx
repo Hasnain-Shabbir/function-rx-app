@@ -49,9 +49,9 @@ const ExerciseCard = ({
       };
     }
     return {
-      sets: exercise.sets,
-      reps: exercise.reps,
-      time: exercise.time,
+      sets: exercise.sets || 0,
+      reps: exercise.reps || 0,
+      time: exercise.time || 0,
     };
   };
 
@@ -115,4 +115,3 @@ const ExerciseCard = ({
 };
 
 export { ExerciseCard };
-
