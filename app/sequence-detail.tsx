@@ -303,7 +303,7 @@ const SequenceDetail = () => {
       </ScrollView>
 
       {/* Bottom Action Bar */}
-      <View
+      {/* <View
         className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
         style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
@@ -324,7 +324,7 @@ const SequenceDetail = () => {
             Start Exercise
           </Button>
         </View>
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };
