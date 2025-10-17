@@ -23,11 +23,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 const EditProfile = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -828,6 +832,7 @@ const EditProfile = () => {
                       className="bg-white rounded-t-3xl shadow-lg"
                       activeOpacity={1}
                       onPress={() => {}}
+                      style={{ paddingBottom: insets.bottom }}
                     >
                       {/* Drag Handle */}
                       <View className="items-center py-3">
@@ -846,7 +851,7 @@ const EditProfile = () => {
                       </View>
 
                       {/* Options */}
-                      <View className="px-6 pb-8">
+                      <View className="px-6 pb-4">
                         {genderOptions.map((option) => (
                           <TouchableOpacity
                             key={option.value}
@@ -895,6 +900,7 @@ const EditProfile = () => {
                       className="bg-white rounded-t-3xl shadow-lg"
                       activeOpacity={1}
                       onPress={() => {}}
+                      style={{ paddingBottom: insets.bottom }}
                     >
                       {/* Drag Handle */}
                       <View className="items-center py-3">
