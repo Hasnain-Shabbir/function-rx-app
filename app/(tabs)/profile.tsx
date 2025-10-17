@@ -22,9 +22,10 @@ import { Toast } from "toastify-react-native";
 const Profile = () => {
   const router = useRouter();
   const { user, loading: userLoading, refetch: refetchUser } = useUser();
-  const { enableBiometricLogin, disableBiometricLogin, isBiometricEnabled } =
+  const { enableBiometricLogin, disableBiometricLogin, isBiometricEnabled, checkBiometricSupport } =
     useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [biometricSupported, setBiometricSupported] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const insets = useSafeAreaInsets();
@@ -34,9 +35,19 @@ const Profile = () => {
     setBiometricEnabled(enabled);
   }, [isBiometricEnabled]);
 
+  const checkBiometricAvailability = React.useCallback(async () => {
+    const support = await checkBiometricSupport();
+    setBiometricSupported(support.available);
+    
+    if (!support.available) {
+      Toast.info("Biometric authentication is not available on this device");
+    }
+  }, [checkBiometricSupport]);
+
   useEffect(() => {
     checkBiometricStatus();
-  }, [checkBiometricStatus]);
+    checkBiometricAvailability();
+  }, [checkBiometricStatus, checkBiometricAvailability]);
 
   const handleEditProfile = () => {
     router.push("/edit-profile");
@@ -212,6 +223,7 @@ const Profile = () => {
           onChangePassword={handleChangePassword}
           onLogout={handleLogout}
           biometricEnabled={biometricEnabled}
+          biometricSupported={biometricSupported}
         />
       </ScrollView>
 
