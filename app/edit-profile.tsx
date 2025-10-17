@@ -245,6 +245,23 @@ const EditProfile = () => {
         }
       }
 
+      // Date of birth validation - check for future dates
+      if (formData.dateOfBirth && formData.dateOfBirth.trim()) {
+        try {
+          const birthDate = new Date(formData.dateOfBirth);
+          const today = new Date();
+
+          // Check if the date is valid
+          if (isNaN(birthDate.getTime())) {
+            newErrors.dateOfBirth = "Please enter a valid date";
+          } else if (birthDate > today) {
+            newErrors.dateOfBirth = "Date of birth cannot be in the future";
+          }
+        } catch {
+          newErrors.dateOfBirth = "Please enter a valid date";
+        }
+      }
+
       // ZipCode validation (basic)
       if (formData.zipCode && formData.zipCode.trim()) {
         const zipCodeRegex = /^\d{5}(-\d{4})?$/;
@@ -569,6 +586,14 @@ const EditProfile = () => {
   const handleDateChange = (event: any, selectedDate?: Date) => {
     try {
       const currentDate = selectedDate || new Date();
+      const today = new Date();
+
+      // Check if the selected date is in the future
+      if (currentDate > today) {
+        Toast.error("Date of birth cannot be in the future");
+        return;
+      }
+
       setShowDatePicker(Platform.OS === "ios");
       setSelectedDate(currentDate);
 
@@ -582,6 +607,14 @@ const EditProfile = () => {
         ...prevState,
         dateOfBirth: formattedDate,
       }));
+
+      // Clear any existing date error
+      if (errors.dateOfBirth) {
+        setErrors((prev) => ({
+          ...prev,
+          dateOfBirth: "",
+        }));
+      }
     } catch (error) {
       console.error("Error handling date change:", error);
       Toast.error("Error setting date");
@@ -760,6 +793,9 @@ const EditProfile = () => {
                         onPress: () => setShowDatePicker(true),
                         showArrow: true,
                         editable: false,
+                        errorMessage: hasSubmitted
+                          ? errors.dateOfBirth
+                          : undefined,
                       },
                     ]}
                   />
