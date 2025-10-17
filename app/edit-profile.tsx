@@ -678,9 +678,15 @@ const EditProfile = () => {
     }
   };
 
+  // Helper function to format gender for display
+  const formatGenderForDisplay = (gender: string) => {
+    if (!gender) return "";
+    return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+  };
+
   const genderOptions = [
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
   ];
 
   return (
@@ -823,7 +829,7 @@ const EditProfile = () => {
                       {
                         id: "gender",
                         title: "Gender",
-                        value: formData.gender,
+                        value: formatGenderForDisplay(formData.gender),
                         onPress: () => setShowGenderPicker(true),
                         showArrow: true,
                         editable: false,
