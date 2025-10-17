@@ -23,6 +23,7 @@ export async function removeValue(key: string) {
 
 const useOtpVerification = () => {
   const [otp, setOtp] = useState("");
+  const [validationError, setValidationError] = useState("");
   const { login } = useSession();
   const { refreshUserData } = useUser();
   const [, setUserType] = useStorageState("user_type");
@@ -38,6 +39,15 @@ const useOtpVerification = () => {
 
   // verify the otp
   const handleOtpVerification = async () => {
+    // Clear any previous validation errors
+    setValidationError("");
+
+    // Frontend validation: Check if OTP is complete
+    if (otp.length !== 6) {
+      setValidationError("Please enter all 6 digits of the OTP code.");
+      return;
+    }
+
     try {
       await validateOtp({
         variables: {
@@ -91,6 +101,10 @@ const useOtpVerification = () => {
 
   const handleOTPChange = (value: string) => {
     setOtp(value);
+    // Clear validation error when user starts typing
+    if (validationError) {
+      setValidationError("");
+    }
   };
 
   useEffect(() => {
@@ -126,6 +140,7 @@ const useOtpVerification = () => {
     email,
     validateOtpLoading,
     isEmailChangeRoute,
+    validationError,
   };
 };
 

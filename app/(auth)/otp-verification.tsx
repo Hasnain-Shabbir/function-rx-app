@@ -18,7 +18,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const OtpVerification = () => {
-  const { handleOtpVerification, handleOTPChange } = useOtpVerification();
+  const {
+    handleOtpVerification,
+    handleOTPChange,
+    validateOtpLoading,
+    validationError,
+  } = useOtpVerification();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -72,8 +77,20 @@ const OtpVerification = () => {
 
               <View className="gap-4">
                 <InputOTP slots={6} onChange={handleOTPChange} />
-                <Button size={"md"} onPress={handleOtpVerification}>
-                  Send Code
+                {validationError && (
+                  <Typography
+                    variant="body2"
+                    className="text-red-500 text-center"
+                  >
+                    {validationError}
+                  </Typography>
+                )}
+                <Button
+                  size={"md"}
+                  onPress={handleOtpVerification}
+                  loading={validateOtpLoading}
+                >
+                  {validateOtpLoading ? "Verifying..." : "Verify Code"}
                 </Button>
               </View>
             </View>

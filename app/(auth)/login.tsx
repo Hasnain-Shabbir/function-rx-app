@@ -3,7 +3,7 @@ import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -22,7 +22,9 @@ const Login = () => {
     handleLoginSubmit,
     loginUserLoading,
     errors,
+    resetForm,
   } = useLoginForm();
+  console.log("🚀 ~ Login ~ loginUserLoading:", loginUserLoading);
   const { authenticateWithBiometric, isBiometricEnabled } = useBiometricAuth();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -31,14 +33,14 @@ const Login = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  useEffect(() => {
-    checkBiometricAvailability();
-  }, []);
-
-  const checkBiometricAvailability = async () => {
+  const checkBiometricAvailability = useCallback(async () => {
     const enabled = await isBiometricEnabled();
     setBiometricAvailable(enabled);
-  };
+  }, [isBiometricEnabled]);
+
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, [checkBiometricAvailability]);
 
   const handleBiometricLogin = async () => {
     await authenticateWithBiometric();
@@ -47,6 +49,8 @@ const Login = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
+      // Reset form state and button loading state
+      resetForm();
       // Refresh biometric availability status
       await checkBiometricAvailability();
       // You can add other login page refresh logic here
@@ -138,7 +142,7 @@ const Login = () => {
                 <Button
                   size="md"
                   className="w-full mb-4"
-                  disabled={loginUserLoading}
+                  // disabled={loginUserLoading}
                   onPress={() => {
                     handleLoginSubmit();
                     console.log("Login pressed");
