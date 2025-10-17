@@ -84,6 +84,26 @@ const EditProfile = () => {
     return false;
   };
 
+  // Helper to format phone number as user types
+  const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const digitsOnly = value.replace(/\D/g, "");
+
+    // Limit to 10 digits for US phone numbers
+    const limitedDigits = digitsOnly.slice(0, 10);
+
+    // Format based on length
+    if (limitedDigits.length === 0) {
+      return "";
+    } else if (limitedDigits.length <= 3) {
+      return `(${limitedDigits}`;
+    } else if (limitedDigits.length <= 6) {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3)}`;
+    } else {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3, 6)}-${limitedDigits.slice(6)}`;
+    }
+  };
+
   // Helper to check if phone is required and valid
   const validateRequiredPhone = (phoneValue: string | undefined): boolean => {
     if (!phoneValue || phoneValue.trim() === "") return false;
@@ -158,9 +178,16 @@ const EditProfile = () => {
     fieldName: keyof typeof formData
   ) => {
     try {
+      let processedText = text;
+
+      // Handle phone formatting
+      if (fieldName === "phone") {
+        processedText = formatPhoneNumber(text);
+      }
+
       setFormData((prevState) => ({
         ...prevState,
-        [fieldName]: text,
+        [fieldName]: processedText,
       }));
 
       // Clear error when user starts typing
@@ -175,9 +202,9 @@ const EditProfile = () => {
       if (fieldName === "phone") {
         if (hasSubmitted) {
           // Revalidate on change only after submit attempt
-          const valid = validateRequiredPhone(text);
+          const valid = validateRequiredPhone(processedText);
           if (!valid) {
-            if (!text || text.trim() === "") {
+            if (!processedText || processedText.trim() === "") {
               setPhoneError("Phone number is required");
             } else {
               setPhoneError("Please enter a valid US phone number");
@@ -711,6 +738,7 @@ const EditProfile = () => {
                           handleInputChange(text, "phone"),
                         placeholder: "Enter your phone number",
                         errorMessage: hasSubmitted ? phoneError : undefined,
+                        maxLength: 14, // (XXX) XXX-XXXX format
                       },
                       {
                         id: "gender",

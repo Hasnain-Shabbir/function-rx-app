@@ -16,6 +16,7 @@ export interface AppInputProps {
   titleClassName?: string;
   valueClassName?: string;
   testID?: string;
+  maxLength?: number;
 }
 
 const AppInput = React.forwardRef<TextInput, AppInputProps>(
@@ -34,6 +35,7 @@ const AppInput = React.forwardRef<TextInput, AppInputProps>(
       titleClassName,
       valueClassName,
       testID,
+      maxLength,
       ...props
     },
     ref
@@ -85,6 +87,7 @@ const AppInput = React.forwardRef<TextInput, AppInputProps>(
                 onBlur={handleBlur}
                 multiline={multiline}
                 numberOfLines={numberOfLines}
+                maxLength={maxLength}
                 className={cn(
                   "text-base text-primary-500 py-1 text-right",
                   multiline ? "top" : "center"

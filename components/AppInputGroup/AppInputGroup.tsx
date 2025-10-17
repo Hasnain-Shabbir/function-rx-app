@@ -18,6 +18,7 @@ export interface AppInputItem {
   valueClassName?: string;
   testID?: string;
   errorMessage?: string;
+  maxLength?: number;
 }
 
 export interface AppInputGroupProps {
@@ -73,6 +74,7 @@ const AppInputGroup = React.forwardRef<View, AppInputGroupProps>(
                   titleClassName={input.titleClassName}
                   valueClassName={input.valueClassName}
                   testID={input.testID}
+                  maxLength={input.maxLength}
                   className="border-0 bg-transparent rounded-none"
                 />
                 {input.errorMessage && (
