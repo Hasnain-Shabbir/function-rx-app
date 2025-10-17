@@ -5,6 +5,7 @@ import {
   ImagePicker,
   Typography,
 } from "@/components";
+import { Button } from "@/components/Button/Button";
 import { API_CONFIG } from "@/constants/config";
 import { usStates } from "@/constants/statesList";
 import { getValueFor } from "@/hooks/useOtpVerification";
@@ -160,7 +161,7 @@ const EditProfile = () => {
             lastName: user.lastName || "",
             email: user.email || "",
             phone: user.phone || "",
-            gender: user.gender || "",
+            gender: (user.gender || "").toLowerCase(),
             dateOfBirth: user.dateOfBirth || "",
             address: user.address || "",
             city: user.city || "",
@@ -184,6 +185,11 @@ const EditProfile = () => {
   ) => {
     try {
       let processedText = text;
+
+      // Handle gender formatting - store in lowercase
+      if (fieldName === "gender") {
+        processedText = text.toLowerCase();
+      }
 
       // Handle phone formatting
       if (fieldName === "phone") {
@@ -474,7 +480,7 @@ const EditProfile = () => {
                 lastName: updatedUser.lastName || "",
                 email: updatedUser.email || "",
                 phone: updatedUser.phone || "",
-                gender: updatedUser.gender || "",
+                gender: (updatedUser.gender || "").toLowerCase(),
                 dateOfBirth: updatedUser.dateOfBirth || "",
                 address: updatedUser.address || "",
                 city: updatedUser.city || "",
@@ -596,7 +602,7 @@ const EditProfile = () => {
               lastName: user.lastName || "",
               email: user.email || "",
               phone: user.phone || "",
-              gender: user.gender || "",
+              gender: (user.gender || "").toLowerCase(),
               dateOfBirth: user.dateOfBirth || "",
               address: user.address || "",
               city: user.city || "",
@@ -685,8 +691,8 @@ const EditProfile = () => {
   };
 
   const genderOptions = [
-    { label: "Male", value: "Male" },
-    { label: "Female", value: "Female" },
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
   ];
 
   return (
@@ -741,18 +747,15 @@ const EditProfile = () => {
                 </Typography>
 
                 {/* Save Button */}
-                <TouchableOpacity
+                <Button
+                  variant="link"
+                  size="sm"
                   onPress={handleSaveChanges}
                   disabled={updateUserLoading}
                   className="p-2"
                 >
-                  <Typography
-                    variant="body3"
-                    className={`font-medium ${updateUserLoading ? "text-gray-400" : "text-primary-500"}`}
-                  >
-                    Save
-                  </Typography>
-                </TouchableOpacity>
+                  {updateUserLoading ? "Saving..." : "Save"}
+                </Button>
               </View>
 
               <ScrollView
