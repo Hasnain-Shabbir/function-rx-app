@@ -3,7 +3,6 @@ import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
-import { Link } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
@@ -126,32 +125,26 @@ const Login = () => {
                   returnKeyType="done"
                   onSubmitEditing={handleLoginSubmit}
                 />
-                <View className="items-start">
+                {/* <View className="items-start">
                   <Link href="/forgot-password" asChild>
                     <Button variant={"link"} size={"md"} className="p-0">
                       Forgot Password?
                     </Button>
                   </Link>
-
-                  {/* <Link href="/otp-verification" asChild>
-                <Button variant={"link"} size={"md"} className="p-0">
-                  Otp Verification
-                </Button>
-              </Link> */}
-                </View>
+                </View> */}
               </View>
 
               <View>
                 <Button
                   size="md"
                   className="w-full mb-4"
-                  // disabled={loginUserLoading}
+                  disabled={loginUserLoading}
                   onPress={() => {
                     handleLoginSubmit();
                     console.log("Login pressed");
                   }}
                 >
-                  Login
+                  {loginUserLoading ? "Logging in..." : "Login"}
                 </Button>
                 {biometricAvailable && (
                   <Button

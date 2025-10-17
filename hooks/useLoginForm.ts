@@ -48,6 +48,9 @@ const useLoginForm = () => {
       if (!password.trim()) {
         newErrors.password = "Password is required";
         hasErrors = true;
+      } else if (password.length < 8) {
+        newErrors.password = "Password must be at least 8 characters";
+        hasErrors = true;
       }
 
       // Set errors and return if validation fails

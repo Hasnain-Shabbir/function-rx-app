@@ -93,7 +93,11 @@ export default function Index() {
             >
               Welcome
             </Typography>
-            <Typography variant="h6" fontWeight="semibold">
+            <Typography
+              variant="h6"
+              fontWeight="semibold"
+              className="text-wrap"
+            >
               {user?.fullName ||
                 `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
                 "User"}

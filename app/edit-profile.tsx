@@ -662,20 +662,12 @@ const EditProfile = () => {
                   <ImagePicker
                     initialImage={formData.profileImage}
                     onImageSelected={(uri, file) => {
-                      console.log("Image selected - URI:", uri);
-                      console.log("Image selected - File:", file);
-                      console.log("File object structure:", {
-                        uri: file?.uri,
-                        type: file?.type,
-                        name: file?.name,
-                      });
                       setFormData((prev) => ({
                         ...prev,
                         profileImage: uri,
                       }));
                       // Store the file for upload
                       setSelectedImageFile(file);
-                      console.log("SelectedImageFile set to:", file);
                     }}
                     size={120}
                   />
