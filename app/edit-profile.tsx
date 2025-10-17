@@ -13,7 +13,7 @@ import { FETCH_USER } from "@/services/graphql/queries/sequencesQueries";
 import { useMutation, useQuery } from "@apollo/client/react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -32,6 +32,7 @@ import { Toast } from "toastify-react-native";
 const EditProfile = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const scrollViewRef = useRef<ScrollView>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -189,6 +190,22 @@ const EditProfile = () => {
         processedText = formatPhoneNumber(text);
       }
 
+      // Handle zip code formatting and length validation
+      if (fieldName === "zipCode") {
+        // Remove any non-digit characters except dash
+        processedText = text.replace(/[^\d-]/g, "");
+
+        // Limit to 9 characters (5 digits + dash + 4 digits for ZIP+4)
+        if (processedText.length > 9) {
+          processedText = processedText.slice(0, 9);
+        }
+
+        // Auto-format with dash after 5 digits
+        if (processedText.length === 5 && !processedText.includes("-")) {
+          // Don't auto-add dash, let user type it
+        }
+      }
+
       setFormData((prevState) => ({
         ...prevState,
         [fieldName]: processedText,
@@ -215,6 +232,25 @@ const EditProfile = () => {
             }
           } else {
             setPhoneError(undefined);
+          }
+        }
+      }
+
+      // Handle zip code validation
+      if (fieldName === "zipCode" && hasSubmitted) {
+        if (processedText && processedText.trim()) {
+          const zipCodeRegex = /^\d{5}(-\d{4})?$/;
+          if (!zipCodeRegex.test(processedText)) {
+            setErrors((prev) => ({
+              ...prev,
+              zipCode:
+                "Please enter a valid US zip code (5 digits or ZIP+4 format)",
+            }));
+          } else {
+            setErrors((prev) => ({
+              ...prev,
+              zipCode: "",
+            }));
           }
         }
       }
@@ -262,11 +298,12 @@ const EditProfile = () => {
         }
       }
 
-      // ZipCode validation (basic)
+      // ZipCode validation - US zip codes only
       if (formData.zipCode && formData.zipCode.trim()) {
         const zipCodeRegex = /^\d{5}(-\d{4})?$/;
         if (!zipCodeRegex.test(formData.zipCode)) {
-          newErrors.zipCode = "Please enter a valid zip code";
+          newErrors.zipCode =
+            "Please enter a valid US zip code (5 digits or ZIP+4 format)";
         }
       }
 
@@ -295,6 +332,10 @@ const EditProfile = () => {
     setPhoneError(undefined);
 
     if (!validateForm()) {
+      // Scroll to bottom to show validation errors
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
       return;
     }
 
@@ -709,6 +750,7 @@ const EditProfile = () => {
               </View>
 
               <ScrollView
+                ref={scrollViewRef}
                 className="flex-1 p-5"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
@@ -836,6 +878,8 @@ const EditProfile = () => {
                         onChangeText: (text) =>
                           handleInputChange(text, "zipCode"),
                         placeholder: "Enter your zipcode",
+                        maxLength: 9, // 5 digits or 5 digits + dash + 4 digits
+                        errorMessage: hasSubmitted ? errors.zipCode : undefined,
                       },
                     ]}
                   />
