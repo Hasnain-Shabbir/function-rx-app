@@ -96,7 +96,7 @@ export default function Index() {
             <Typography
               variant="h6"
               fontWeight="semibold"
-              className="text-wrap"
+              className="text-wrap max-w-[190px]"
             >
               {user?.fullName ||
                 `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
