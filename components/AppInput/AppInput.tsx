@@ -60,6 +60,7 @@ const AppInput = React.forwardRef<TextInput, AppInputProps>(
         className={cn(
           "flex-row items-center justify-between py-4 px-4 bg-white rounded-lg border border-gray-200",
           isFocused && "border-primary-500 bg-primary-50",
+          !editable && "opacity-60",
           className
         )}
         testID={testID}
