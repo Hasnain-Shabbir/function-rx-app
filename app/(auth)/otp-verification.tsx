@@ -47,6 +47,7 @@ const OtpVerification = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView className="flex-1 items-center px-5 bg-misc">
           <ScrollView
+            keyboardShouldPersistTaps="handled"
             className="flex-1 w-full"
             contentContainerStyle={{
               flexGrow: 1,
@@ -88,7 +89,7 @@ const OtpVerification = () => {
                 <Button
                   size={"md"}
                   onPress={handleOtpVerification}
-                  loading={validateOtpLoading}
+                  // loading={validateOtpLoading}
                 >
                   {validateOtpLoading ? "Verifying..." : "Verify Code"}
                 </Button>

@@ -72,6 +72,7 @@ const Login = () => {
       {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
       <SafeAreaView className="flex-1 bg-misc">
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           className="flex-1"
           contentContainerStyle={{
             flexGrow: 1,

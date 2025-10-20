@@ -6,9 +6,10 @@ import {
   UserInfoCard,
 } from "@/components";
 import { Button } from "@/components/Button/Button";
-import { useUser } from "@/context";
+import { useSession, useUser } from "@/context";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { getValueFor, removeValue } from "@/hooks/useOtpVerification";
+import { setStorageItemAsync } from "@/hooks/useStorageState";
 import { isTokenExpired } from "@/utils/jwtUtils";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -21,9 +22,14 @@ import { Toast } from "toastify-react-native";
 
 const Profile = () => {
   const router = useRouter();
+  const { logout } = useSession();
   const { user, loading: userLoading, refetch: refetchUser } = useUser();
-  const { enableBiometricLogin, disableBiometricLogin, isBiometricEnabled, checkBiometricSupport } =
-    useBiometricAuth();
+  const {
+    enableBiometricLogin,
+    disableBiometricLogin,
+    isBiometricEnabled,
+    checkBiometricSupport,
+  } = useBiometricAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricSupported, setBiometricSupported] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -38,7 +44,7 @@ const Profile = () => {
   const checkBiometricAvailability = React.useCallback(async () => {
     const support = await checkBiometricSupport();
     setBiometricSupported(support.available);
-    
+
     if (!support.available) {
       Toast.info("Biometric authentication is not available on this device");
     }
@@ -81,6 +87,7 @@ const Profile = () => {
     try {
       // Check if biometric login is enabled
       const biometricEnabled = await getValueFor("biometric_enabled");
+      const existingToken = await getValueFor("session");
 
       if (biometricEnabled === "true") {
         // Keep auth credentials for biometric login
@@ -103,7 +110,12 @@ const Profile = () => {
         Toast.success("Logged out successfully");
       }
 
-      // Close modal and navigate to login screen
+      // Clear in-memory session; if biometric is enabled, move token to biometric storage and clear active session
+      logout();
+      if (biometricEnabled === "true" && existingToken) {
+        await setStorageItemAsync("biometric_session", existingToken);
+        await setStorageItemAsync("session", null);
+      }
       setShowLogoutModal(false);
       router.replace("/login");
     } catch (error) {
@@ -124,6 +136,7 @@ const Profile = () => {
           // Token is expired or invalid, disable biometric login and clear data
           await removeValue("biometric_enabled");
           await removeValue("session");
+          logout();
           await removeValue("user_type");
           await removeValue("user_id");
 

@@ -5,9 +5,11 @@ import {
   MotionIcon,
   UserIcon,
 } from "@/assets/icons";
-import { Tabs } from "expo-router";
+import { useSession } from "@/context";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabItem = ({
@@ -37,6 +39,17 @@ const TabItem = ({
 
 const Layout = () => {
   const insets = useSafeAreaInsets();
+  const { isLoading, session } = useSession();
+
+  // While restoring session, render a lightweight loader to avoid route flicker
+  if (isLoading) {
+    return <ActivityIndicator style={{ flex: 1 }} size="large" />;
+  }
+
+  // If not authenticated, redirect to login
+  if (!session) {
+    return <Redirect href="/login" />;
+  }
 
   return (
     <Tabs

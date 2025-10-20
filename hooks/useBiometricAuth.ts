@@ -52,8 +52,10 @@ export const useBiometricAuth = () => {
         const biometricEnabled = await getValueFor("biometric_enabled");
 
         if (biometricEnabled === "true") {
-          // Check if we have stored credentials from a previous login
-          const storedToken = await getValueFor("session");
+          // Check if we have stored credentials saved for biometric login
+          const storedToken =
+            (await getValueFor("biometric_session")) ||
+            (await getValueFor("session"));
           const storedUserType = await getValueFor("user_type");
           const storedUserId = await getValueFor("user_id");
 
@@ -65,6 +67,7 @@ export const useBiometricAuth = () => {
               // Token is expired, disable biometric login and clear stored data
               await removeValue("biometric_enabled");
               await removeValue("session");
+              await removeValue("biometric_session");
               await removeValue("user_type");
               await removeValue("user_id");
 
@@ -76,6 +79,7 @@ export const useBiometricAuth = () => {
               // Invalid token, disable biometric login
               await removeValue("biometric_enabled");
               await removeValue("session");
+              await removeValue("biometric_session");
               await removeValue("user_type");
               await removeValue("user_id");
 
@@ -176,7 +180,9 @@ export const useBiometricAuth = () => {
       }
 
       // Check if token is still valid (HIPAA compliance)
-      const storedToken = await getValueFor("session");
+      const storedToken =
+        (await getValueFor("biometric_session")) ||
+        (await getValueFor("session"));
       if (!storedToken) {
         // No token, disable biometric login
         await removeValue("biometric_enabled");
@@ -188,6 +194,7 @@ export const useBiometricAuth = () => {
         // Token is expired or invalid, disable biometric login and clear data
         await removeValue("biometric_enabled");
         await removeValue("session");
+        await removeValue("biometric_session");
         await removeValue("user_type");
         await removeValue("user_id");
         return false;

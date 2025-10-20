@@ -68,7 +68,9 @@ const useOtpVerification = () => {
               return;
             }
 
+            // On successful OTP, set active session and also cache for biometric if enabled later
             login(token);
+            await SecureStore.setItemAsync("biometric_session", token);
             setUserType(userRole);
             setUserId(user.id);
 
@@ -82,7 +84,7 @@ const useOtpVerification = () => {
             setOtp("");
             setEmail("");
 
-            navigate.push("/");
+            navigate.replace("/");
           }
         },
         onError: (err) => {
