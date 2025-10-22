@@ -78,13 +78,13 @@ export const useSequenceDetail = (
     if (item.type === "superset") {
       return {
         sets: item.sequentialExercises[0]?.sets || 0,
-        reps: item.reps || 0,
+        reps: item.sequentialExercises[0]?.repetition || 0,
         time: item.sequentialExercises[0]?.time || 0,
       };
     }
     return {
       sets: item.sets || 0,
-      reps: item.reps || 0,
+      reps: item.repetition || 0,
       time: item.time || 0,
     };
   };

@@ -35,7 +35,7 @@ const SupersetCard = ({
     }
   };
   const getSupersetReps = () => {
-    return superset.reps || 0;
+    return superset.repetition || 0;
   };
 
   const getFirstExerciseMetrics = () => {

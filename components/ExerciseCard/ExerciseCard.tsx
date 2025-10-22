@@ -44,13 +44,13 @@ const ExerciseCard = ({
     if (exercise.type === "superset") {
       return {
         sets: exercise.sequentialExercises[0]?.sets || 0,
-        reps: exercise.reps || 0,
+        reps: exercise.sequentialExercises[0]?.repetition || 0,
         time: exercise.sequentialExercises[0]?.time || 0,
       };
     }
     return {
       sets: exercise.sets || 0,
-      reps: exercise.reps || 0,
+      reps: exercise.repetition || 0,
       time: exercise.time || 0,
     };
   };
