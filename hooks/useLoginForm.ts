@@ -31,6 +31,7 @@ const useLoginForm = () => {
   const handleLoginSubmit = async () => {
     try {
       setIsSubmitting(true);
+
       const { email, password } = formData;
       let hasErrors = false;
       const newErrors = { email: "", password: "" };
@@ -57,50 +58,39 @@ const useLoginForm = () => {
       if (hasErrors) {
         setErrors(newErrors);
         setIsSubmitting(false);
+
         return;
       }
 
       // Clear errors if validation passes
       setErrors({ email: "", password: "" });
 
-      try {
-        await loginUser({
-          variables: {
-            email,
-            password,
-          },
-          onCompleted: async (res: any) => {
-            console.log("response form the login: ", res.loginUser.message);
+      loginUser({
+        variables: {
+          email,
+          password,
+        },
+        onCompleted: async (res: any) => {
+          Toast.success(res.loginUser.message);
 
-            Toast.success(res.loginUser.message);
+          // set email in local storage to pass in otp verification
+          setLoginEmail(email);
 
-            // set email in local storage to pass in otp verification
-            setLoginEmail(email);
+          // reset the form state
+          setFormData({
+            email: "",
+            password: "",
+          });
 
-            // reset the form state
-            setFormData({
-              email: "",
-              password: "",
-            });
-
-            setIsSubmitting(false);
-            navigate.push("/otp-verification");
-          },
-          onError: (err) => {
-            // console.error("error while logging in: ", err);
-            Toast.error(err.message || "Login failed. Please try again.");
-            setIsSubmitting(false);
-          },
-        });
-      } catch (mutationError) {
-        // Handle any errors from the mutation that might not trigger onError
-        if (mutationError instanceof Error) {
-          Toast.error(
-            mutationError.message || "Login failed. Please try again."
-          );
-        }
-        setIsSubmitting(false);
-      }
+          setIsSubmitting(false);
+          navigate.push("/otp-verification");
+        },
+        onError: (err) => {
+          // console.error("error while logging in: ", err);
+          Toast.error(err.message || "Login failed. Please try again.");
+          setIsSubmitting(false);
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         Toast.error(error.message || "Login failed. Please try again.");

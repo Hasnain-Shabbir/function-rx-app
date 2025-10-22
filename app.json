@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "FunctionRx",
-    "slug": "functionrx",
+    "slug": "function-rx",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo-small.png",
@@ -20,7 +20,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.functionrx"
+      "package": "com.anonymous.functionrx",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -57,8 +60,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f2576849-020a-4f43-b0c6-97361cab625e"
+        "projectId": "4361134e-7514-49c7-97f9-52add57f4dec"
       }
-    }
+    },
+    "owner": "hasnain-shabbir"
   }
 }

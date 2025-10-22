@@ -201,9 +201,9 @@ const EditProfile = () => {
         // Remove any non-digit characters except dash
         processedText = text.replace(/[^\d-]/g, "");
 
-        // Limit to 9 characters (5 digits + dash + 4 digits for ZIP+4)
-        if (processedText.length > 9) {
-          processedText = processedText.slice(0, 9);
+        // Limit to 10 characters (5 digits + dash + 4 digits for ZIP+4)
+        if (processedText.length > 10) {
+          processedText = processedText.slice(0, 10);
         }
 
         // Auto-format with dash after 5 digits
@@ -887,7 +887,7 @@ const EditProfile = () => {
                         onChangeText: (text) =>
                           handleInputChange(text, "zipCode"),
                         placeholder: "Enter your zipcode",
-                        maxLength: 9, // 5 digits or 5 digits + dash + 4 digits
+                        maxLength: 10, // 5 digits or 5 digits + dash + 4 digits
                         errorMessage: hasSubmitted ? errors.zipCode : undefined,
                       },
                     ]}

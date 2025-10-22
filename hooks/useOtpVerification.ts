@@ -24,6 +24,7 @@ export async function removeValue(key: string) {
 const useOtpVerification = () => {
   const [otp, setOtp] = useState("");
   const [validationError, setValidationError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useSession();
   const { refreshUserData } = useUser();
   const [, setUserType] = useStorageState("user_type");
@@ -39,17 +40,19 @@ const useOtpVerification = () => {
 
   // verify the otp
   const handleOtpVerification = async () => {
-    // Clear any previous validation errors
-    setValidationError("");
-
-    // Frontend validation: Check if OTP is complete
-    if (otp.length !== 6) {
-      setValidationError("Please enter all 6 digits of the OTP code.");
-      return;
-    }
-
     try {
-      await validateOtp({
+      setIsSubmitting(true);
+      // Clear any previous validation errors
+      setValidationError("");
+
+      // Frontend validation: Check if OTP is complete
+      if (otp.length !== 6) {
+        setValidationError("Please enter all 6 digits of the OTP code.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      validateOtp({
         variables: {
           otpCode: otp,
           email,
@@ -65,6 +68,7 @@ const useOtpVerification = () => {
               Toast.error(
                 "You cannot login to the app. Only clients can login."
               );
+              setIsSubmitting(false);
               return;
             }
 
@@ -83,12 +87,14 @@ const useOtpVerification = () => {
 
             setOtp("");
             setEmail("");
+            setIsSubmitting(false);
 
             navigate.replace("/");
           }
         },
         onError: (err) => {
           Toast.error(err.message || "Invalid OTP. Please try again.");
+          setIsSubmitting(false);
         },
       });
     } catch (error) {
@@ -96,8 +102,9 @@ const useOtpVerification = () => {
         Toast.error(
           error.message || "OTP verification failed. Please try again."
         );
-        console.error("error while validating the otp: ", error);
+        // console.error("error while validating the otp: ", error);
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -140,7 +147,7 @@ const useOtpVerification = () => {
     setOtp,
     handleOTPChange,
     email,
-    validateOtpLoading,
+    validateOtpLoading: isSubmitting,
     isEmailChangeRoute,
     validationError,
   };

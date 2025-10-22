@@ -89,7 +89,8 @@ const OtpVerification = () => {
                 <Button
                   size={"md"}
                   onPress={handleOtpVerification}
-                  // loading={validateOtpLoading}
+                  disabled={validateOtpLoading}
+                  className="w-full"
                 >
                   {validateOtpLoading ? "Verifying..." : "Verify Code"}
                 </Button>

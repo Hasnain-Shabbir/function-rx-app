@@ -24,7 +24,7 @@ const Login = () => {
     errors,
     resetForm,
   } = useLoginForm();
-  console.log("🚀 ~ Login ~ loginUserLoading:", loginUserLoading);
+
   const { authenticateWithBiometric, isBiometricEnabled } = useBiometricAuth();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -143,10 +143,9 @@ const Login = () => {
                 <Button
                   size="md"
                   className="w-full mb-4"
-                  // disabled={loginUserLoading}
+                  disabled={loginUserLoading}
                   onPress={() => {
                     handleLoginSubmit();
-                    console.log("Login pressed");
                   }}
                 >
                   {loginUserLoading ? "Logging in..." : "Login"}

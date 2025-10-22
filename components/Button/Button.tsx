@@ -6,7 +6,7 @@ import * as React from "react";
 import { Image, TouchableOpacity } from "react-native";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center whitespace-nowrap transition-all duration-300 ease-in-out disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex cursor-pointer items-center justify-center whitespace-nowrap transition-all duration-300 ease-in-out disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -80,7 +80,7 @@ const Button = React.forwardRef<
           loading && "pointer-events-none opacity-[0.4]"
         )}
         disabled={props.disabled || loading}
-        onPress={props.disabled || loading ? undefined : props.onPress}
+        onPress={props.onPress}
         {...props}
       >
         {/* in case of the icon button loading */}
