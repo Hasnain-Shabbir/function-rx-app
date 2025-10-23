@@ -3,6 +3,7 @@ import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import useLoginForm from "@/hooks/useLoginForm";
+import { Link } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
@@ -130,13 +131,13 @@ const Login = () => {
                   returnKeyType="done"
                   onSubmitEditing={handleLoginSubmit}
                 />
-                {/* <View className="items-start">
+                <View className="items-start">
                   <Link href="/forgot-password" asChild>
                     <Button variant={"link"} size={"md"} className="p-0">
                       Forgot Password?
                     </Button>
                   </Link>
-                </View> */}
+                </View>
               </View>
 
               <View>

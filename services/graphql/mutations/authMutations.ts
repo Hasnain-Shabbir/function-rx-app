@@ -170,3 +170,73 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
+export const FORGOT_PASSWORD = gql`
+  mutation SendResetPasswordInstructions($email: String!) {
+    sendResetPasswordInstructions(input: { email: $email }) {
+      message
+    }
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation SetPassword(
+    $password: String!
+    $passwordConfirmation: String!
+    $resetPasswordToken: String
+  ) {
+    setPassword(
+      input: {
+        setPasswordAttributes: {
+          password: $password
+          passwordConfirmation: $passwordConfirmation
+          resetPasswordToken: $resetPasswordToken
+        }
+      }
+    ) {
+      token
+      user {
+        resetPasswordToken
+        address
+        archived
+        calendarLink
+        city
+        clinicId
+        clinicName
+        createdAt
+        deleted
+        email
+        firstName
+        fullName
+        gender
+        id
+        imageUrl
+        invitationSentAt
+        lastName
+        lastSignInAt
+        onboardingCompleted
+        phone
+        revokeAccess
+        state
+        subscriptionPaid
+        userType
+        zipCode
+        clinicImageUrl
+        dateOfBirth
+        conditions
+        medicalHistory
+        pregnant
+        surgeries
+        pregnancyDueDate
+      }
+    }
+  }
+`;
+
+export const RESEND_OTP = gql`
+  mutation ResendOtp($email: String!) {
+    resendOtp(input: { email: $email }) {
+      message
+    }
+  }
+`;

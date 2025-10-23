@@ -72,6 +72,7 @@ const useLoginForm = () => {
         },
         onCompleted: async (res: any) => {
           Toast.success(res.loginUser.message);
+          console.log("res login: ", res);
 
           // set email in local storage to pass in otp verification
           setLoginEmail(email);

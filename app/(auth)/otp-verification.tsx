@@ -21,7 +21,10 @@ const OtpVerification = () => {
   const {
     handleOtpVerification,
     handleOTPChange,
+    handleResendOtp,
     validateOtpLoading,
+    resendOtpLoading,
+    email,
     validationError,
   } = useOtpVerification();
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +75,7 @@ const OtpVerification = () => {
                   2 Factor Authentication
                 </Typography>
                 <Typography variant="body1" className="text-medium mt-1">
-                  Enter the code you have received on {"email"}
+                  Enter the code you have received on {email || "your email"}
                 </Typography>
               </View>
 
@@ -94,6 +97,21 @@ const OtpVerification = () => {
                 >
                   {validateOtpLoading ? "Verifying..." : "Verify Code"}
                 </Button>
+
+                <View className="flex-row items-center justify-center gap-2">
+                  <Typography variant="body2" className="text-medium">
+                    Didn&apos;t receive the code?
+                  </Typography>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onPress={handleResendOtp}
+                    disabled={resendOtpLoading}
+                    className="p-0"
+                  >
+                    {resendOtpLoading ? "Sending..." : "Resend"}
+                  </Button>
+                </View>
               </View>
             </View>
           </ScrollView>

@@ -1,7 +1,10 @@
 import { useSession } from "@/context/SessionProvider/SessionProvider";
 import { useUser } from "@/context/UserProvider/UserProvider";
 import { useStorageState } from "@/hooks/useStorageState";
-import { VALIDATE_OTP } from "@/services/graphql/mutations/authMutations";
+import {
+  RESEND_OTP,
+  VALIDATE_OTP,
+} from "@/services/graphql/mutations/authMutations";
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -31,12 +34,14 @@ const useOtpVerification = () => {
   const [, setUserId] = useStorageState("user_id");
 
   const [email, setEmail] = useState("");
-  const [, setRedirectUrl] = useState("");
+  const [redirectUrl, setRedirectUrl] = useState("");
+  console.log("🚀 ~ useOtpVerification ~ redirectUrl:", redirectUrl);
   const navigate = useRouter();
   // const isEmailChangeRoute = window.location.pathname.includes("email-otp");
   const isEmailChangeRoute = false;
-  const [validateOtp, { loading: validateOtpLoading }] =
-    useMutation(VALIDATE_OTP);
+  const [validateOtp] = useMutation(VALIDATE_OTP);
+
+  const [resendOtp, { loading: resendOtpLoading }] = useMutation(RESEND_OTP);
 
   // verify the otp
   const handleOtpVerification = async () => {
@@ -58,11 +63,28 @@ const useOtpVerification = () => {
           email,
         },
         onCompleted: async (res: any) => {
+          console.log("response from otp verification:", res);
           const token = res.validateOtp.token;
           const user: any = res.validateOtp.user;
           const userRole = res.validateOtp.user.userType;
+          const resetToken = res.validateOtp.user.resetPasswordToken;
+          console.log("🚀 ~ handleOtpVerification ~ resetToken:", resetToken);
 
-          if (token) {
+          // Check if this is a forgot password flow (has redirectUrl)
+          if (redirectUrl) {
+            // This is a forgot password flow
+            console.log("🚀 ~ handleOtpVerification ~ resetToken:", resetToken);
+            if (resetToken) {
+              // Store reset token for password reset page
+              await SecureStore.setItemAsync("reset_token", resetToken);
+              Toast.success("OTP verified successfully");
+              setOtp("");
+              setIsSubmitting(false);
+              navigate.replace("/reset-password");
+              return;
+            }
+          } else if (token) {
+            // This is a login flow
             // Check if user type is client
             if (userRole !== "client") {
               Toast.error(
@@ -116,6 +138,31 @@ const useOtpVerification = () => {
     }
   };
 
+  // Resend OTP functionality
+  const handleResendOtp = async () => {
+    try {
+      if (!email) {
+        Toast.error("Email not found. Please try again.");
+        return;
+      }
+
+      await resendOtp({
+        variables: { email },
+        onCompleted: (res: any) => {
+          Toast.success(res.resendOtp.message || "OTP resent successfully");
+        },
+        onError: (err) => {
+          Toast.error(err.message || "Failed to resend OTP. Please try again.");
+        },
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        Toast.error(error.message || "Failed to resend OTP. Please try again.");
+        console.error("Error while resending OTP:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     const loadSavedData = async () => {
       const savedEmail = await getValueFor("login_email");
@@ -146,8 +193,10 @@ const useOtpVerification = () => {
     otp,
     setOtp,
     handleOTPChange,
+    handleResendOtp,
     email,
     validateOtpLoading: isSubmitting,
+    resendOtpLoading,
     isEmailChangeRoute,
     validationError,
   };
