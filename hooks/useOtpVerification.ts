@@ -24,7 +24,7 @@ export async function removeValue(key: string) {
   await SecureStore.deleteItemAsync(key);
 }
 
-const useOtpVerification = () => {
+const useOtpVerification = (onResendSuccess?: () => void) => {
   const [otp, setOtp] = useState("");
   const [validationError, setValidationError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -138,7 +138,7 @@ const useOtpVerification = () => {
     }
   };
 
-  // Resend OTP functionality
+  // Resend OTP functionality - timer will be reset by the component after successful response
   const handleResendOtp = async () => {
     try {
       if (!email) {
@@ -150,6 +150,10 @@ const useOtpVerification = () => {
         variables: { email },
         onCompleted: (res: any) => {
           Toast.success(res.resendOtp.message || "OTP resent successfully");
+          // Call the success callback to reset timer
+          if (onResendSuccess) {
+            onResendSuccess();
+          }
         },
         onError: (err) => {
           Toast.error(err.message || "Failed to resend OTP. Please try again.");

@@ -23,6 +23,7 @@ export { ImagePicker } from "./ImagePicker";
 export { Picker } from "./Picker/Picker";
 export type { PickerItem, PickerProps } from "./Picker/Picker";
 export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";
+export { default as ResendTimer } from "./ResendTimer/ResendTimer";
 export { SequenceCardSkeleton } from "./SequenceCardSkeleton/SequenceCardSkeleton";
 export { Skeleton } from "./Skeleton/Skeleton";
 export { default as StatCard } from "./StatCard/StatCard";

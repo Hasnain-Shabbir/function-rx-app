@@ -1,8 +1,9 @@
 import { ChevronLeft } from "@/assets/icons";
-import { Typography } from "@/components";
+import { ResendTimer, Typography } from "@/components";
 import { Button } from "@/components/Button/Button";
 import InputOTP from "@/components/InputOTP/InputOTP";
 
+import useOtpTimer from "@/hooks/useOtpTimer";
 import useOtpVerification from "@/hooks/useOtpVerification";
 import { Link } from "expo-router";
 import React, { useState } from "react";
@@ -18,6 +19,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const OtpVerification = () => {
+  const { initialTime, resetTimer, startFirstTimer } = useOtpTimer({
+    isAdminRoute: false, // Mobile app doesn't have admin routes
+  });
+
   const {
     handleOtpVerification,
     handleOTPChange,
@@ -26,8 +31,30 @@ const OtpVerification = () => {
     resendOtpLoading,
     email,
     validationError,
-  } = useOtpVerification();
+  } = useOtpVerification(resetTimer); // Pass resetTimer as callback
+
   const [refreshing, setRefreshing] = useState(false);
+  const [hasStartedFirstTimer, setHasStartedFirstTimer] = useState(false);
+
+  // Start timer for first OTP when component mounts - only once
+  React.useEffect(() => {
+    // Only start timer if there's no existing timer running and we haven't started the first timer yet
+    if (initialTime === 0 && !hasStartedFirstTimer) {
+      startFirstTimer();
+      setHasStartedFirstTimer(true);
+    }
+  }, [initialTime, startFirstTimer, hasStartedFirstTimer]);
+
+  // Handle resend OTP with timer reset
+  const handleResendOtpWithTimer = async () => {
+    try {
+      // Call the resend OTP function
+      await handleResendOtp();
+      // Timer reset is handled by the callback in the hook
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -84,7 +111,7 @@ const OtpVerification = () => {
                 {validationError && (
                   <Typography
                     variant="body2"
-                    className="text-red-500 text-center"
+                    className="text-danger-500 text-center"
                   >
                     {validationError}
                   </Typography>
@@ -102,15 +129,11 @@ const OtpVerification = () => {
                   <Typography variant="body2" className="text-medium">
                     Didn&apos;t receive the code?
                   </Typography>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onPress={handleResendOtp}
-                    disabled={resendOtpLoading}
-                    className="p-0"
-                  >
-                    {resendOtpLoading ? "Sending..." : "Resend"}
-                  </Button>
+                  <ResendTimer
+                    initialTime={initialTime}
+                    onResend={handleResendOtpWithTimer}
+                    loading={resendOtpLoading}
+                  />
                 </View>
               </View>
             </View>
