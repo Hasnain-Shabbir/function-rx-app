@@ -64,7 +64,7 @@ const Layout = () => {
           padding: 8,
         },
         tabBarStyle: {
-          backgroundColor: "#ffffff",
+          backgroundColor: "#f9faf7",
           borderTopColor: "#e5e5e5",
           position: "absolute",
           overflow: "hidden",

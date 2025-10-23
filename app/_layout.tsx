@@ -34,7 +34,14 @@ function RootNavigator() {
   const { session } = useSession();
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: "#f9faf7",
+        },
+      }}
+    >
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="change-password" options={{ headerShown: false }} />
