@@ -35,7 +35,6 @@ const useOtpVerification = (onResendSuccess?: () => void) => {
 
   const [email, setEmail] = useState("");
   const [redirectUrl, setRedirectUrl] = useState("");
-  console.log("🚀 ~ useOtpVerification ~ redirectUrl:", redirectUrl);
   const navigate = useRouter();
   // const isEmailChangeRoute = window.location.pathname.includes("email-otp");
   const isEmailChangeRoute = false;
@@ -64,16 +63,10 @@ const useOtpVerification = (onResendSuccess?: () => void) => {
         },
         onCompleted: async (res: any) => {
           console.log("response from otp verification:", res);
-          const token = res.validateOtp.token;
-          const user: any = res.validateOtp.user;
-          const userRole = res.validateOtp.user.userType;
-          const resetToken = res.validateOtp.user.resetPasswordToken;
-          console.log("🚀 ~ handleOtpVerification ~ resetToken:", resetToken);
 
           // Check if this is a forgot password flow (has redirectUrl)
           if (redirectUrl) {
-            // This is a forgot password flow
-            console.log("🚀 ~ handleOtpVerification ~ resetToken:", resetToken);
+            const resetToken = res.validateOtp.user.resetPasswordToken;
             if (resetToken) {
               // Store reset token for password reset page
               await SecureStore.setItemAsync("reset_token", resetToken);
@@ -83,8 +76,14 @@ const useOtpVerification = (onResendSuccess?: () => void) => {
               navigate.replace("/reset-password");
               return;
             }
-          } else if (token) {
-            // This is a login flow
+          }
+
+          // This is a login flow
+          const token = res.validateOtp.token;
+          const user: any = res.validateOtp.user;
+          const userRole = res.validateOtp.user.userType;
+
+          if (token) {
             // Check if user type is client
             if (userRole !== "client") {
               Toast.error(
@@ -183,7 +182,7 @@ const useOtpVerification = (onResendSuccess?: () => void) => {
     loadSavedData();
   }, []);
 
-  // Cleanup localStorage on unmount
+  // Cleanup storage on unmount
   useEffect(() => {
     return () => {
       removeValue("redirectTo");
