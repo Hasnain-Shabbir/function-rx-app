@@ -114,6 +114,7 @@ const Analytics = () => {
             sets={3}
             reps={3}
             imageSource={require("@/assets/images/man-standing.png")}
+            isSkipped={true}
             onPress={() => {
               // Handle exercise card press
               console.log("Exercise card pressed");

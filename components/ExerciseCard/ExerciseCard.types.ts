@@ -40,4 +40,9 @@ export interface ExerciseCardProps {
    * Optional custom className for additional styling
    */
   className?: string;
+
+  /**
+   * Whether this exercise was skipped, which will show a danger background for the count badge
+   */
+  isSkipped?: boolean;
 }

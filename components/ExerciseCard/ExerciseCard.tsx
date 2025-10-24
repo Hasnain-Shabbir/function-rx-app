@@ -14,6 +14,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   imageBackgroundColor = "bg-primary-200",
   onPress,
   className = "",
+  isSkipped = false,
 }) => {
   const CardContent = (
     <View
@@ -35,7 +36,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         ) : (
           <View className="w-full h-full rounded-sm" />
         )}
-        <View className="bg-primary-500 w-6 rounded-full items-center justify-center h-6 absolute -top-1 -right-1">
+        <View
+          className={`${isSkipped ? "bg-red-500" : "bg-primary-500"} w-6 rounded-full items-center justify-center h-6 absolute -top-1 -right-1`}
+        >
           <Typography variant="footer" className="text-white">
             {count}
           </Typography>
