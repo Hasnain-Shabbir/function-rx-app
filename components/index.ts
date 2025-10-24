@@ -26,6 +26,8 @@ export { Picker } from "./Picker/Picker";
 export type { PickerItem, PickerProps } from "./Picker/Picker";
 export { default as ProfileButtons } from "./ProfileButtons/ProfileButtons";
 export { default as ResendTimer } from "./ResendTimer/ResendTimer";
+export { default as LatestSequenceCard } from "./SequenceCard/LatestSequenceCard";
+export type { LatestSequenceCardProps } from "./SequenceCard/LatestSequenceCard.types";
 export { default as SequenceCard } from "./SequenceCard/SequenceCard";
 export type { SequenceCardProps } from "./SequenceCard/SequenceCard.types";
 export { SequenceCardSkeleton } from "./SequenceCardSkeleton/SequenceCardSkeleton";
