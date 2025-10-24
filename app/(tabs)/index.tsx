@@ -1,4 +1,13 @@
-import { Avatar, Skeleton, StatCard, Typography } from "@/components";
+import { CheckmarkCircle } from "@/assets/icons";
+import Calendar from "@/assets/icons/svg/Calendar";
+import {
+  Avatar,
+  SequenceCard,
+  Skeleton,
+  StatCard,
+  Typography,
+} from "@/components";
+import Tag from "@/components/Tag/Tag";
 import { stats } from "@/constants/stats";
 import { useUser } from "@/context";
 import { useState } from "react";
@@ -105,6 +114,43 @@ export default function Index() {
           </View>
 
           <Avatar size="xl" src={user?.imageUrl || undefined} />
+        </View>
+
+        {/* Sequence Card */}
+        <View className="mt-6">
+          <SequenceCard
+            onStart={() => {
+              // Handle start sequence action
+              console.log("Start sequence pressed");
+            }}
+          />
+        </View>
+
+        {/* Previous Sequences */}
+        <View className="p-4 rounded-2xl space-y-2">
+          <Tag title="Completed" />
+          <View>
+            <Typography variant="body2" fontWeight="semibold">
+              Exercise sequence for legs
+            </Typography>
+            <View className="flex-row items-center mb-4">
+              <View className="flex-row items-center mr-4 gap-1">
+                <Calendar />
+                <Typography variant="caption" className="text-white">
+                  10 May 2025
+                </Typography>
+              </View>
+              <Typography variant="caption" className="text-white/70 mr-4">
+                •
+              </Typography>
+              <View className="flex-row items-center gap-1">
+                <CheckmarkCircle color="white" size={16} />
+                <Typography variant="caption" className="text-white">
+                  Completed 3 times
+                </Typography>
+              </View>
+            </View>
+          </View>
         </View>
 
         <View className="mt-6">

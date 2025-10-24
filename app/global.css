@@ -5,3 +5,7 @@
 .hexagon {
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
+
+.sequence-gradient {
+  background: linear-gradient(180deg, #5171b1 0%, #364b76 100%);
+}

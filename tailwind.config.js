@@ -107,6 +107,9 @@ module.exports = {
       fontFamily: {
         figtree: ["Figtree", "sans-serif"],
       },
+      backgroundImage: {
+        "gradient-primary": "linear-gradient(180deg, #5171B1 0%, #364B76 100%)",
+      },
     },
   },
   plugins: [],
