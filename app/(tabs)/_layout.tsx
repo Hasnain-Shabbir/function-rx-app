@@ -93,7 +93,7 @@ const Layout = () => {
       <Tabs.Screen
         name="analytics"
         options={{
-          headerShown: false,
+          // headerShown: false,
           title: "Analytics",
           tabBarIcon: ({ focused }) => (
             <TabItem focused={focused} icon={AnalyticsIcon} label="Analytics" />

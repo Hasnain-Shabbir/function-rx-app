@@ -1,6 +1,8 @@
-import { Typography } from "@/components";
+import { ExerciseCard, StatCard, Typography } from "@/components";
+import { Button } from "@/components/Button/Button";
+import { stats } from "@/constants/stats";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -31,7 +33,48 @@ const Analytics = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <Typography variant="h6">Analytics</Typography>
+        <View className="flex justify-between items-center flex-row">
+          <Typography variant="body1">Progress Overview</Typography>
+          <Button className="p-0" variant={"link"}>
+            All Time
+          </Button>
+        </View>
+
+        {/* Stats */}
+        <View className="mt-6">
+          <FlatList
+            data={stats}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={{ gap: 8 }}
+            contentContainerStyle={{ gap: 8 }}
+            renderItem={({ item }) => (
+              <View className="flex-1">
+                <StatCard {...item} />
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+
+        {/* frequent repeated exercises */}
+        <View className="mt-8">
+          <Typography variant="body1" fontWeight="semibold" className="mb-4">
+            Frequently Repeated Exercises
+          </Typography>
+
+          <ExerciseCard
+            name="2 way press in line"
+            count={2}
+            sets={3}
+            reps={3}
+            imageSource={require("@/assets/images/man-standing.png")}
+            onPress={() => {
+              // Handle exercise card press
+              console.log("Exercise card pressed");
+            }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
