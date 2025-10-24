@@ -76,7 +76,7 @@ const Button = React.forwardRef<
         ref={ref}
         className={cn(
           buttonVariants({ variant, size, className }),
-          "items-center",
+          "items-center flex-row",
           loading && "pointer-events-none opacity-[0.4]"
         )}
         disabled={props.disabled || loading}
