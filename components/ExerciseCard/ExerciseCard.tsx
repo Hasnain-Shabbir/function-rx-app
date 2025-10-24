@@ -1,117 +1,86 @@
-import { CombinedExerciseItem } from "@/services/graphql/queries/sequenceTypes";
-import { useRouter } from "expo-router";
+import { RepeatIcon, WorkoutStretching } from "@/assets/icons";
+import ChevronRight from "@/assets/icons/svg/ChevronRight";
+import { Typography } from "@/components";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
+import type { ExerciseCardProps } from "./ExerciseCard.types";
 
-interface ExerciseCardProps {
-  exercise: CombinedExerciseItem;
-  index: number;
-  version: "long" | "short";
-  onPress?: () => void;
-}
-
-const ExerciseCard = ({
-  exercise,
-  index,
-  version,
+const ExerciseCard: React.FC<ExerciseCardProps> = ({
+  name,
+  count,
+  sets,
+  reps,
+  imageSource,
+  imageBackgroundColor = "bg-primary-200",
   onPress,
-}: ExerciseCardProps) => {
-  const router = useRouter();
-
-  const handlePress = () => {
-    if (onPress) {
-      onPress();
-    } else {
-      // Navigate to exercise detail page
-      router.push({
-        pathname: "/exercise-detail",
-        params: {
-          exerciseId: exercise.id,
-        },
-      });
-    }
-  };
-  const getInstructions = () => {
-    if (exercise.type === "superset") {
-      return exercise.sequentialExercises[0]?.shortVersion || "";
-    }
-    return version === "long"
-      ? exercise.writtenInstructions
-      : exercise.shortVersion;
-  };
-
-  const getMetrics = () => {
-    if (exercise.type === "superset") {
-      return {
-        sets: exercise.sequentialExercises[0]?.sets || 0,
-        reps: exercise.sequentialExercises[0]?.repetition || 0,
-        time: exercise.sequentialExercises[0]?.time || 0,
-      };
-    }
-    return {
-      sets: exercise.sets || 0,
-      reps: exercise.repetition || 0,
-      time: exercise.time || 0,
-    };
-  };
-
-  const metrics = getMetrics();
-  const instructions = getInstructions();
-
-  return (
-    <TouchableOpacity
-      className="bg-white p-4 rounded-lg border border-gray-200 mb-3"
-      onPress={handlePress}
-      activeOpacity={0.7}
+  className = "",
+}) => {
+  const CardContent = (
+    <View
+      className={`p-2 bg-white rounded-2xl items-center border gap-2 border-borderLight overflow-hidden flex-row ${className}`}
     >
-      <View className="flex-row items-start">
-        {/* Number Circle */}
-        <View className="w-8 h-8 bg-blue-100 rounded-full items-center justify-center mr-3 mt-0.5">
-          <Text className="text-blue-600 font-semibold text-sm">
-            {index + 1}
-          </Text>
+      <View
+        className={`w-[50px] h-[50px] ${imageBackgroundColor} rounded-sm relative`}
+      >
+        {imageSource ? (
+          <Image
+            source={
+              typeof imageSource === "string"
+                ? { uri: imageSource }
+                : imageSource
+            }
+            className="w-full h-full rounded-sm"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="w-full h-full rounded-sm" />
+        )}
+        <View className="bg-primary-500 w-6 rounded-full items-center justify-center h-6 absolute -top-1 -right-1">
+          <Typography variant="footer" className="text-white">
+            {count}
+          </Typography>
         </View>
+      </View>
 
-        {/* Content */}
-        <View className="flex-1">
-          {/* Title */}
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="font-semibold text-gray-900 text-base flex-1">
-              {exercise.name}
-            </Text>
-            <Text className="text-gray-400 ml-2">→</Text>
+      <View className="flex-1">
+        <View className="flex-row items-center">
+          <Typography variant="body2" fontWeight="semibold">
+            {name}
+          </Typography>
+          <ChevronRight />
+        </View>
+        <View className="flex-row items-center gap-1.5 mt-1">
+          <View className="flex-row items-center gap-1">
+            <WorkoutStretching size={16} color="#626e6b" />
+            <Typography variant="caption" className="text-medium">
+              {sets} sets
+            </Typography>
           </View>
 
-          {/* Instructions */}
-          {instructions && (
-            <Text className="text-sm text-gray-500 mb-3 leading-5">
-              {instructions.length > 100
-                ? `${instructions.substring(0, 100)}...`
-                : instructions}
-            </Text>
-          )}
+          <Typography variant="caption" className="text-medium">
+            •
+          </Typography>
 
-          {/* Metrics */}
-          <View className="flex-row items-center">
-            <View className="flex-row items-center mr-4">
-              <Text className="text-gray-400 mr-1">👤</Text>
-              <Text className="text-sm text-gray-600">{metrics.sets} sets</Text>
-            </View>
-
-            <View className="flex-row items-center mr-4">
-              <Text className="text-gray-400 mr-1">💬</Text>
-              <Text className="text-sm text-gray-600">{metrics.reps} reps</Text>
-            </View>
-
-            <View className="flex-row items-center">
-              <Text className="text-gray-400 mr-1">⏰</Text>
-              <Text className="text-sm text-gray-600">{metrics.time} min</Text>
-            </View>
+          <View className="flex-row items-center gap-1">
+            <RepeatIcon size={16} color="#626e6b" />
+            <Typography variant="caption" className="text-medium">
+              {reps} reps
+            </Typography>
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        {CardContent}
+      </TouchableOpacity>
+    );
+  }
+
+  return CardContent;
 };
 
-export { ExerciseCard };
+export default ExerciseCard;
