@@ -41,6 +41,15 @@ const Analytics = () => {
 
   return (
     <SafeAreaView className="flex-1 justify-center bg-misc">
+      <View className="bg-white border-b border-borderLight">
+        <Typography
+          variant="body1"
+          className="text-center py-4"
+          fontWeight="semibold"
+        >
+          Analytics
+        </Typography>
+      </View>
       <ScrollView
         className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
