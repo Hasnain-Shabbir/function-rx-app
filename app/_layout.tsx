@@ -31,7 +31,12 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { session } = useSession();
+  const { session, isLoading } = useSession();
+
+  // While restoring session, show a loader
+  if (isLoading) {
+    return null; // Let SplashScreenController handle the loading
+  }
 
   return (
     <Stack
@@ -51,7 +56,7 @@ function RootNavigator() {
       </Stack.Protected>
 
       <Stack.Protected guard={!session}>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
     </Stack>
   );
