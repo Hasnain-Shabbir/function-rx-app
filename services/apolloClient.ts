@@ -20,7 +20,6 @@ const httpLink = new HttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   const token = await getValueFor("session");
-
   return {
     headers: {
       ...headers,
@@ -61,20 +60,26 @@ const errorLink = onError((error: any) => {
       // Clear all storage
       const clearAllStorage = async () => {
         try {
-          // Clear all possible storage keys
-          await removeValue("session");
-          await removeValue("biometric_session");
-          await removeValue("reset_token");
+          const storageKeysToClear = [
+            "session",
+            "biometric_session",
+            "reset_token",
+            "user_id", // ADDED
+            "user_type", // ADDED
+            "login_email", // ADDED
+          ];
+
+          for (const key of storageKeysToClear) {
+            await removeValue(key);
+          }
 
           // Clear localStorage on web platform
           if (Platform.OS === "web") {
             localStorage.clear();
           }
 
-          // Clear Apollo cache
           client.clearStore();
 
-          // Navigate to login with a small delay to ensure storage is cleared
           setTimeout(() => {
             router.replace("/(auth)/login");
           }, 100);
